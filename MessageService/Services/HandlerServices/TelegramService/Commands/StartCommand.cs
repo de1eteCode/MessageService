@@ -4,12 +4,14 @@ using Telegram.Bot.Types;
 namespace MessageService.Services.HandlerServices.TelegramService.Commands;
 
 public class StartCommand : BotCommandAction {
+    private readonly ILogger<BotCommandAction> _logger;
 
-    public StartCommand()
+    public StartCommand(ILogger<BotCommandAction> logger)
         : base("start", "Инициализация бота") {
+        _logger = logger;
     }
 
     public override void ExecuteAction(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken) {
-        throw new NotImplementedException();
+        _logger.LogInformation("Вызвана инициализация бота");
     }
 }

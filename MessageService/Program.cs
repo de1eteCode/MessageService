@@ -1,6 +1,7 @@
 using MessageService.Data;
 using MessageService.Datas;
 using MessageService.Services.HandlerServices.TelegramService;
+using MessageService.Services.HandlerServices.TelegramService.Commands;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,6 @@ public class Program {
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-
         builder.Services.AddDbContext<DataContext>(options => {
             options.UseNpgsql(builder.Configuration.GetConnectionString("psql"));
         });
@@ -22,7 +22,12 @@ public class Program {
         builder.Services.AddServerSideBlazor();
         builder.Services.AddSingleton<WeatherForecastService>();
 
-        builder.Services.AddSingleton<ITelegramHandlerService, TelegramHandlerService>();
+        // Telegram commands
+        builder.Services.AddTransient<BotCommandAction, StartCommand>();
+        builder.Services.AddTransient<BotCommandAction, ReplyMeCommand>();
+
+        builder.Services.AddScoped<ITelegramHandlerService, TelegramHandlerService>();
+        builder.Services.AddHostedService<TelegramHandlerService>();
 
         var app = builder.Build();
 
