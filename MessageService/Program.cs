@@ -1,9 +1,6 @@
 using MessageService.Data;
 using MessageService.Datas;
-using MessageService.Services.HandlerServices.TelegramService;
-using MessageService.Services.HandlerServices.TelegramService.Commands;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using MessageService.Services.HandlerServices;
 using Microsoft.EntityFrameworkCore;
 
 namespace MessageService;
@@ -22,12 +19,9 @@ public class Program {
         builder.Services.AddServerSideBlazor();
         builder.Services.AddSingleton<WeatherForecastService>();
 
-        // Telegram commands
-        builder.Services.AddTransient<BotCommandAction, StartCommand>();
-        builder.Services.AddTransient<BotCommandAction, ReplyMeCommand>();
-
-        builder.Services.AddScoped<ITelegramHandlerService, TelegramHandlerService>();
-        builder.Services.AddHostedService<TelegramHandlerService>();
+        // Telegram service
+        builder.Services.AddTelegramHandler();
+        builder.Services.AddAllTelegramCommands();
 
         var app = builder.Build();
 

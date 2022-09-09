@@ -31,7 +31,10 @@ public abstract class BotCommandAction : BotCommand {
     }
 
     /// <summary>
-    /// Вызов операции
+    /// Вызов обработки команды
     /// </summary>
+    /// <param name="botClient">Телеграм клиент бота</param>
+    /// <param name="update">Обновление</param>
+    /// <param name="cancellationToken">Токен отмены операции</param>
     public abstract void ExecuteAction(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken);
 }

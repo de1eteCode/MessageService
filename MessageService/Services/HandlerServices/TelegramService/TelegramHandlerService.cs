@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using MessageService.Services.HandlerServices.TelegramService.Handlers;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -10,10 +11,10 @@ public interface ITelegramHandlerService : IHostedService { }
 
 public class TelegramHandlerService : ITelegramHandlerService {
     private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<TelegramHandlerService> _logger;
     private readonly TelegramBotClient _telegramClient;
     private readonly CancellationTokenSource _tokenSource;
     private readonly ReceiverOptions _receiverOptions;
-    private readonly ILogger<TelegramHandlerService> _logger;
 
     public TelegramHandlerService(IConfiguration configuration, ILogger<TelegramHandlerService> logger, IServiceProvider serviceProvider) {
         _logger = logger;
@@ -51,36 +52,27 @@ public class TelegramHandlerService : ITelegramHandlerService {
     /// <param name="update"></param>
     /// <param name="cancellationToken">Токен отмены операции</param>
     public Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken) {
-        if (update.Message is null) {
-            _logger.LogInformation("Message is empty");
-            return Task.CompletedTask;
-        }
+        switch (update.Type) {
+            case Telegram.Bot.Types.Enums.UpdateType.Message:
+                var obj = _serviceProvider.GetService<CommandHandler>();
+                return obj.HandleUpdateAsync(botClient, update, cancellationToken);
 
-        switch (update.Message.Type) {
-            case Telegram.Bot.Types.Enums.MessageType.Text:
-                var msgtxt = update.Message?.Text?.Split(' ').First() ?? String.Empty;
-
-                if (string.IsNullOrEmpty(msgtxt)) {
-                    break;
-                }
-
-                var commands = _serviceProvider.GetServices<BotCommandAction>();
-                var command = commands.FirstOrDefault(e => e.Command.Equals(msgtxt));
-
-                if (command != null) {
-                    update.Message.Text = String.Join(" ", update.Message.Text.Split(' ').Skip(1));
-                    command.ExecuteAction(botClient, update, cancellationToken);
-                }
-                else {
-                    if (msgtxt.First().Equals('/')) {
-                        _logger.LogInformation("Not supported command: " + update.Message.Text);
-                    }
-                }
-
-                break;
-
+            case Telegram.Bot.Types.Enums.UpdateType.InlineQuery:
+            case Telegram.Bot.Types.Enums.UpdateType.ChosenInlineResult:
+            case Telegram.Bot.Types.Enums.UpdateType.CallbackQuery:
+            case Telegram.Bot.Types.Enums.UpdateType.EditedMessage:
+            case Telegram.Bot.Types.Enums.UpdateType.ChannelPost:
+            case Telegram.Bot.Types.Enums.UpdateType.EditedChannelPost:
+            case Telegram.Bot.Types.Enums.UpdateType.ShippingQuery:
+            case Telegram.Bot.Types.Enums.UpdateType.PreCheckoutQuery:
+            case Telegram.Bot.Types.Enums.UpdateType.Poll:
+            case Telegram.Bot.Types.Enums.UpdateType.PollAnswer:
+            case Telegram.Bot.Types.Enums.UpdateType.MyChatMember:
+            case Telegram.Bot.Types.Enums.UpdateType.ChatMember:
+            case Telegram.Bot.Types.Enums.UpdateType.ChatJoinRequest:
+            case Telegram.Bot.Types.Enums.UpdateType.Unknown:
             default:
-                _logger.LogInformation("Not supported type of message: " + update.Message.Type);
+                _logger.LogError($"Обновления типа {update.Type} не поддерживаются");
                 break;
         }
 
