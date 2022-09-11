@@ -6,8 +6,7 @@ namespace MessageService.Services.HandlerServices.TelegramService.Handlers.Messa
 
 public class ReplyMeCommand : BotCommandAction {
 
-    public ReplyMeCommand(ITelegramHandlerService s) : base("replyme", "Отправь сообщение и бот его повторит") {
-        var x = s.GetMeAsync();
+    public ReplyMeCommand() : base("replyme", "Отправь сообщение и бот его повторит") {
     }
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {

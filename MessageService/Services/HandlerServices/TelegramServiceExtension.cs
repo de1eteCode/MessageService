@@ -2,6 +2,7 @@
 using MessageService.Services.HandlerServices.TelegramService.Handlers;
 using MessageService.Services.HandlerServices.TelegramService.Handlers.Messages.ChatMembers;
 using MessageService.Services.HandlerServices.TelegramService.Handlers.Messages.Commands;
+using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot.Types;
 
 namespace MessageService.Services.HandlerServices;
@@ -30,6 +31,8 @@ public static class TelegramServiceExtension {
         // Chat members passive executeon
         .AddTransient<ForgetChat>()
         .AddTransient<RememberChat>()
+
+        .AddTransient<IWhoIam, TelegramHandlerService>(service => (TelegramHandlerService)service.GetRequiredService<ITelegramHandlerService>())
 
         // service
         .AddSingleton<ITelegramHandlerService, TelegramHandlerService>()

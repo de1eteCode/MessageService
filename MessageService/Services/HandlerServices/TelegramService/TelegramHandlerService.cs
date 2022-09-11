@@ -9,14 +9,9 @@ namespace MessageService.Services.HandlerServices.TelegramService;
 
 public interface ITelegramHandlerService : IHostedService {
     public bool IsStarted { get; }
-
-    /// <summary>
-    /// Информация о боте
-    /// </summary>
-    public Task<User> GetMeAsync();
 }
 
-public class TelegramHandlerService : ITelegramHandlerService {
+public class TelegramHandlerService : ITelegramHandlerService, IWhoIam {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<TelegramHandlerService> _logger;
     private readonly TelegramBotClient _telegramClient;
