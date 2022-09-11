@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace MessageService.Services.HandlerServices.TelegramService;
+namespace MessageService.Services.HandlerServices.TelegramService.Handlers.Messages.Commands;
 
 public abstract class BotCommandAction : BotCommand {
 
@@ -34,7 +34,7 @@ public abstract class BotCommandAction : BotCommand {
     /// Вызов обработки команды
     /// </summary>
     /// <param name="botClient">Телеграм клиент бота</param>
-    /// <param name="update">Обновление</param>
+    /// <param name="message">Сообщение</param>
     /// <param name="cancellationToken">Токен отмены операции</param>
-    public abstract void ExecuteAction(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken);
+    public abstract Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken);
 }

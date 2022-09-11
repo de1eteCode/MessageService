@@ -1,6 +1,7 @@
 using MessageService.Data;
 using MessageService.Datas;
 using MessageService.Services.HandlerServices;
+using MessageService.Services.HelperService;
 using Microsoft.EntityFrameworkCore;
 
 namespace MessageService;
@@ -19,9 +20,10 @@ public class Program {
         builder.Services.AddServerSideBlazor();
         builder.Services.AddSingleton<WeatherForecastService>();
 
+        builder.Services.AddTransient<IDatabaseService<DataContext>, ScopeDatabaseService>();
+
         // Telegram service
         builder.Services.AddTelegramHandler();
-        builder.Services.AddAllTelegramCommands();
 
         var app = builder.Build();
 
