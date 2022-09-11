@@ -2,7 +2,7 @@
 using MessageService.Services.HelperService;
 using Telegram.Bot.Types;
 
-namespace MessageService.Services.HandlerServices.TelegramService.Handlers.Messages.ChatMembers;
+namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.ChatMembers;
 
 /// <summary>
 /// Обработчик для чата, который смотрит на то, кто отсоединился от чата.

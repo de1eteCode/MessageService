@@ -3,7 +3,7 @@ using MessageService.Services.HelperService;
 using System.Security.AccessControl;
 using Telegram.Bot.Types;
 
-namespace MessageService.Services.HandlerServices.TelegramService.Handlers.Messages.ChatMembers;
+namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.ChatMembers;
 
 /// <summary>
 /// Обработчик для чата, который смотрит на то, кто присоединился.
@@ -30,7 +30,7 @@ public class RememberChat {
             if (meInNew != null) {
                 _logger.LogInformation($"Ура, меня добавили в {message.Chat.Type}");
 
-                if (message.Chat.Type != Telegram.Bot.Types.Enums.ChatType.Group) {
+                if (message.Chat.Type != global::Telegram.Bot.Types.Enums.ChatType.Group) {
                     return;
                 }
 

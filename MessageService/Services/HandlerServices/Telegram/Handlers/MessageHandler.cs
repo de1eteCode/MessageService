@@ -1,11 +1,11 @@
-﻿using MessageService.Services.HandlerServices.TelegramService.Handlers.Messages.ChatMembers;
-using MessageService.Services.HandlerServices.TelegramService.Handlers.Messages.Commands;
+﻿using MessageService.Services.HandlerServices.Telegram.Handlers.Messages.ChatMembers;
+using MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Commands;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace MessageService.Services.HandlerServices.TelegramService.Handlers;
+namespace MessageService.Services.HandlerServices.Telegram.Handlers;
 
 /// <summary>
 /// Обработчик, предназченый для распознования и ответа на действия, которые поступили из чата телеграма
@@ -41,6 +41,7 @@ public class MessageHandler : IUpdateHandler<Message> {
 
                 break;
 
+            case MessageType.GroupCreated:
             case MessageType.ChatMembersAdded:
                 await _serviceProvider.GetService<RememberChat>()!.Execute(message);
                 break;

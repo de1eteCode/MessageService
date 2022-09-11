@@ -1,19 +1,20 @@
-﻿using MessageService.Services.HandlerServices.TelegramService.Handlers.Messages.Commands;
+﻿using MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Commands;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace MessageService.Services.HandlerServices.TelegramService;
+namespace MessageService.Services.HandlerServices.Telegram;
 
-public interface ITelegramHandlerService : IHostedService {
+public interface ITelegramService : IHostedService {
+    public TelegramBotClient TelegramBot { get; }
     public bool IsStarted { get; }
 }
 
-public class TelegramHandlerService : ITelegramHandlerService, IWhoIam {
+public class TelegramService : ITelegramService, IWhoIam, ITelegramSenderMessage {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<TelegramHandlerService> _logger;
+    private readonly ILogger<TelegramService> _logger;
     private readonly TelegramBotClient _telegramClient;
     private readonly CancellationTokenSource _tokenSource;
     private readonly ReceiverOptions _receiverOptions;
@@ -23,10 +24,11 @@ public class TelegramHandlerService : ITelegramHandlerService, IWhoIam {
     private User _meUser = default!;
 
     public bool IsStarted { get; private set; }
+    public TelegramBotClient TelegramBot => _telegramClient;
 
-    public TelegramHandlerService(IConfiguration configuration, ILogger<TelegramHandlerService> logger, IServiceProvider serviceProvider) {
+    public TelegramService(IConfiguration configuration, ILogger<TelegramService> logger, IServiceProvider serviceProvider) {
         _supportedUpdates = new() {
-            { UpdateType.Message, (client, update, ct) => HandleInHandler(client, update.Message, ct) },
+            { UpdateType.Message, (client, update, ct) => GetHandlerForMessageType(client, update.Message, ct) },
         };
 
         _logger = logger;
@@ -40,6 +42,8 @@ public class TelegramHandlerService : ITelegramHandlerService, IWhoIam {
         _telegramClient = new TelegramBotClient(configuration["TelegramToken"]);
     }
 
+    #region Service method
+
     /// <summary>
     /// Запуск сервиса
     /// Метод, предоставляемый <see cref="IHostedService"/>
@@ -47,7 +51,7 @@ public class TelegramHandlerService : ITelegramHandlerService, IWhoIam {
     public Task StartAsync(CancellationToken cancellationToken) {
         _telegramClient.SetMyCommandsAsync(_serviceProvider.GetServices<BotCommandAction>(), cancellationToken: _tokenSource.Token);
         _telegramClient.StartReceiving(HandleUpdateAsync, HandlePollingErrorAsync, _receiverOptions, _tokenSource.Token);
-        _logger.LogInformation($"Запущен {nameof(TelegramHandlerService)}");
+        _logger.LogInformation($"Запущен {nameof(TelegramService)}");
         IsStarted = true;
         return Task.CompletedTask;
     }
@@ -58,10 +62,12 @@ public class TelegramHandlerService : ITelegramHandlerService, IWhoIam {
     /// </summary>
     public Task StopAsync(CancellationToken cancellationToken) {
         _tokenSource.Cancel();
-        _logger.LogInformation($"Остановлен {nameof(TelegramHandlerService)}");
+        _logger.LogInformation($"Остановлен {nameof(TelegramService)}");
         IsStarted = false;
         return Task.CompletedTask;
     }
+
+    #endregion Service method
 
     /// <summary>
     /// Обработка входящего сообщения от telegram бота
@@ -81,7 +87,7 @@ public class TelegramHandlerService : ITelegramHandlerService, IWhoIam {
     /// <summary>
     /// Получение хендлера для сообщения типа <typeparamref name="T"/>
     /// </summary>
-    private Task HandleInHandler<T>(ITelegramBotClient botClient, T arg, CancellationToken cancellationToken) {
+    private Task GetHandlerForMessageType<T>(ITelegramBotClient botClient, T arg, CancellationToken cancellationToken) {
         var service = _serviceProvider.GetService<IUpdateHandler<T>>() ?? throw new Exception($"Not found service typeof {typeof(IUpdateHandler<T>)}.");
         return service.HandleUpdateAsync(botClient, arg, cancellationToken);
     }
@@ -109,5 +115,18 @@ public class TelegramHandlerService : ITelegramHandlerService, IWhoIam {
         }
 
         return _meUser;
+    }
+
+    public async Task SendMessageAsync(string message, Datas.Models.Chat chat, int @try = 1) {
+        if (string.IsNullOrEmpty(message)) {
+            return;
+        }
+
+        for (; @try < 3; @try++) {
+            var resMsg = await _telegramClient.SendTextMessageAsync(new ChatId(chat.ChatId ?? throw new ArgumentNullException(nameof(chat))), message);
+            if (resMsg != null) {
+                break;
+            }
+        }
     }
 }

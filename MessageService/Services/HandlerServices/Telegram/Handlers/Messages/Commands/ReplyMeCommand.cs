@@ -2,7 +2,7 @@
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace MessageService.Services.HandlerServices.TelegramService.Handlers.Messages.Commands;
+namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Commands;
 
 public class ReplyMeCommand : BotCommandAction {
 

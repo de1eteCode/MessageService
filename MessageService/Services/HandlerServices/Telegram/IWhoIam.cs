@@ -1,6 +1,6 @@
 ﻿using Telegram.Bot.Types;
 
-namespace MessageService.Services.HandlerServices.TelegramService;
+namespace MessageService.Services.HandlerServices.Telegram;
 
 public interface IWhoIam {
 

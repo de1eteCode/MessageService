@@ -1,4 +1,4 @@
-﻿using MessageService.Services.HandlerServices.TelegramService;
+﻿using MessageService.Services.HandlerServices.Telegram;
 using Microsoft.AspNetCore.Components;
 
 namespace MessageService.Pages;
@@ -6,5 +6,5 @@ namespace MessageService.Pages;
 public class TelegramControlPanelBase : ComponentBase {
 
     [Inject]
-    public ITelegramHandlerService TelegramHandlerService { get; set; } = default!;
+    public ITelegramService TelegramHandlerService { get; set; } = default!;
 }

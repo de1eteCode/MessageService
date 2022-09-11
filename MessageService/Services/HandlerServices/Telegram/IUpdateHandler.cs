@@ -1,6 +1,6 @@
 ﻿using Telegram.Bot;
 
-namespace MessageService.Services.HandlerServices.TelegramService;
+namespace MessageService.Services.HandlerServices.Telegram;
 
 public interface IUpdateHandler<T> {
 

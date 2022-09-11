@@ -1,7 +1,7 @@
-﻿using MessageService.Services.HandlerServices.TelegramService;
-using MessageService.Services.HandlerServices.TelegramService.Handlers;
-using MessageService.Services.HandlerServices.TelegramService.Handlers.Messages.ChatMembers;
-using MessageService.Services.HandlerServices.TelegramService.Handlers.Messages.Commands;
+﻿using MessageService.Services.HandlerServices.Telegram;
+using MessageService.Services.HandlerServices.Telegram.Handlers;
+using MessageService.Services.HandlerServices.Telegram.Handlers.Messages.ChatMembers;
+using MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot.Types;
 
@@ -27,14 +27,16 @@ public static class TelegramServiceExtension {
         // Commands, apply for message handler
         .AddTelegramCommand<StartCommand>()
         .AddTelegramCommand<ReplyMeCommand>()
+        .AddTelegramCommand<SendAllChatMessageCommand>()
 
         // Chat members passive executeon
         .AddTransient<ForgetChat>()
         .AddTransient<RememberChat>()
 
-        .AddTransient<IWhoIam, TelegramHandlerService>(service => (TelegramHandlerService)service.GetRequiredService<ITelegramHandlerService>())
+        .AddTransient<IWhoIam, TelegramService>(service => (TelegramService)service.GetRequiredService<ITelegramService>())
+        .AddTransient<ITelegramSenderMessage, TelegramService>(service => (TelegramService)service.GetRequiredService<ITelegramService>())
 
         // service
-        .AddSingleton<ITelegramHandlerService, TelegramHandlerService>()
-        .AddHostedService(service => (TelegramHandlerService)service.GetRequiredService<ITelegramHandlerService>());
+        .AddSingleton<ITelegramService, TelegramService>()
+        .AddHostedService(service => (TelegramService)service.GetRequiredService<ITelegramService>());
 }
