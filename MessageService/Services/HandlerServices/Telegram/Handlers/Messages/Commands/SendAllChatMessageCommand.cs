@@ -7,6 +7,9 @@ using Telegram.Bot.Types.Enums;
 
 namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Commands;
 
+/// <summary>
+/// Рассылка сообщений по всем чатам
+/// </summary>
 public class SendAllChatMessageCommand : BotCommandAction {
     private readonly IDatabaseService<DataContext> _dbService;
 

@@ -5,7 +5,7 @@ namespace MessageService.Services.HandlerServices.Telegram;
 public interface IUpdateHandler<T> {
 
     /// <summary>
-    ///
+    /// Обработчик обновлений типа <typeparamref name="T"/>
     /// </summary>
     /// <param name="botClient"></param>
     /// <param name="arg"></param>

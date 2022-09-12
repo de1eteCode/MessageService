@@ -1,5 +1,6 @@
 ﻿using MessageService.Datas.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace MessageService.Datas;
 
@@ -9,6 +10,96 @@ public class DataContext : DbContext {
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
+
+        #region Chat configure
+
+        modelBuilder
+            .Entity<Chat>()
+            .HasKey(e => e.ChatId);
+
+        modelBuilder
+            .Entity<Chat>()
+            .Property(e => e.Name)
+            .IsRequired();
+
+        modelBuilder
+            .Entity<Chat>()
+            .Property(e => e.KickedTime)
+            .IsRequired(false);
+
+        modelBuilder
+            .Entity<Chat>()
+            .Property(e => e.KickedByUserLogin)
+            .IsRequired(false);
+
+        modelBuilder
+            .Entity<Chat>()
+            .Property(e => e.IsJoined)
+            .HasDefaultValue(true);
+
+        #endregion Chat configure
+
+        #region Chat group configure
+
+        modelBuilder
+            .Entity<ChatGroup>()
+            .HasKey(e => e.Id);
+
+        modelBuilder
+            .Entity<ChatGroup>()
+            .Property(e => e.Id)
+            .UseIdentityAlwaysColumn(); //
+
+        modelBuilder
+            .Entity<ChatGroup>()
+            .HasOne(e => e.Group)
+            .WithOne()
+            .HasForeignKey<ChatGroup>(e => e.GroupId)
+            .IsRequired();
+
+        modelBuilder
+            .Entity<ChatGroup>()
+            .HasOne(e => e.Chat)
+            .WithOne()
+            .HasForeignKey<ChatGroup>(e => e.ChatId)
+            .IsRequired();
+
+        #endregion Chat group configure
+
+        #region Group configure
+
+        modelBuilder
+            .Entity<Group>()
+            .HasKey(e => e.GroupId);
+
+        modelBuilder
+            .Entity<Group>()
+            .Property(e => e.GroupId)
+            .UseIdentityAlwaysColumn(); //
+
+        modelBuilder
+            .Entity<Group>()
+            .Property(e => e.Title)
+            .IsRequired();
+
+        #endregion Group configure
+
+        #region Role configure
+
+        modelBuilder
+            .Entity<Role>()
+            .HasKey(e => e.RoleId);
+
+        modelBuilder
+            .Entity<Role>()
+            .Property(e => e.RoleId)
+            .UseIdentityAlwaysColumn(); //
+
+        modelBuilder
+            .Entity<Role>()
+            .Property(e => e.RoleName)
+            .IsRequired();
+
         modelBuilder.Entity<Role>().HasData(
             new Role() {
                 RoleId = 1,
@@ -23,7 +114,26 @@ public class DataContext : DbContext {
                 RoleName = "Пользователь"
             });
 
-        modelBuilder.Entity<Chat>().Property(e => e.IsJoined).HasDefaultValue(true);
+        #endregion Role configure
+
+        #region User configure
+
+        modelBuilder
+            .Entity<User>()
+            .HasKey(e => e.Id);
+
+        modelBuilder
+            .Entity<User>()
+            .Property(e => e.Name)
+            .IsRequired();
+
+        modelBuilder
+            .Entity<User>()
+            .HasOne(e => e.Role)
+            .WithMany()
+            .HasForeignKey(e => e.RoleId);
+
+        #endregion User configure
 
         base.OnModelCreating(modelBuilder);
     }

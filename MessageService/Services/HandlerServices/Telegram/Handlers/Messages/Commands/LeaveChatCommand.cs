@@ -1,11 +1,13 @@
-﻿using System.Linq.Expressions;
-using MessageService.Services.HandlerServices.Telegram.Attributes;
+﻿using MessageService.Services.HandlerServices.Telegram.Attributes;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 
 namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Commands;
 
+/// <summary>
+/// Команда выхода бота из чата
+/// </summary>
 [TelegramUserRole("Системный администратор")]
 public class LeaveChatByIdCommand : BotCommandAction {
     private readonly IWhoIam _whoIam;

@@ -7,6 +7,9 @@ using Telegram.Bot.Types;
 
 namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Commands;
 
+/// <summary>
+/// Добавление нового пользователя в БД <see cref="DataContext"/>
+/// </summary>
 [TelegramUserRole("Системный администратор")]
 [TelegramLogin("de1alex")]
 public class AddUserCommand : BotCommandAction {

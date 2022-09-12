@@ -1,5 +1,8 @@
 ﻿namespace MessageService.Services.HandlerServices.Telegram;
 
+/// <summary>
+/// Результат валидации
+/// </summary>
 public enum TelegramValidatorResult {
 
     /// <summary>

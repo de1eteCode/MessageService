@@ -7,6 +7,9 @@ using Telegram.Bot.Types;
 
 namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Commands;
 
+/// <summary>
+/// Получение информации о всех чатах, о которых знает бот
+/// </summary>
 public class GetChatsInfoCommand : BotCommandAction {
     private readonly IDatabaseService<DataContext> _dbService;
 

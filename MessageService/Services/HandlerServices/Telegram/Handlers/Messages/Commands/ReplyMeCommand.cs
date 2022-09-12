@@ -3,6 +3,10 @@ using Telegram.Bot.Types;
 
 namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Commands;
 
+/// <summary>
+/// Тестовая команда
+/// Повторение сообщения, отправленного пользователем
+/// </summary>
 public class ReplyMeCommand : BotCommandAction {
 
     public ReplyMeCommand() : base("replyme", "Отправь сообщение и бот его повторит") {

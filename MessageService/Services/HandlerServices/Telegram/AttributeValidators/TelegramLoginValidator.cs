@@ -4,6 +4,9 @@ using Telegram.Bot.Types;
 
 namespace MessageService.Services.HandlerServices.Telegram.AttributeValidators;
 
+/// <summary>
+/// Валидация телеграмм пользователя по UserName
+/// </summary>
 public class TelegramLoginValidator : BaseValidator<TelegramLoginAttribute>, ITelegramValidator {
 
     public Task<TelegramValidatorResult> IsValidAsync<T>(User user, T obj)

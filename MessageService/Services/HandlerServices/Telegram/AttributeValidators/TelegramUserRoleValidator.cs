@@ -7,6 +7,9 @@ using Telegram.Bot.Types;
 
 namespace MessageService.Services.HandlerServices.Telegram.AttributeValidators;
 
+/// <summary>
+/// Валидация телеграмм пользователя по внутренним ролям
+/// </summary>
 public class TelegramUserRoleValidator : BaseValidator<TelegramUserRoleAttribute>, ITelegramValidator {
     private readonly IDatabaseService<DataContext> _dbService;
 

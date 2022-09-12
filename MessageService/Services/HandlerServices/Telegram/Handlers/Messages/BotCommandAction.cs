@@ -3,6 +3,9 @@ using Telegram.Bot.Types;
 
 namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages;
 
+/// <summary>
+/// Базовый шаблон команды
+/// </summary>
 public abstract class BotCommandAction : BotCommand {
 
     protected BotCommandAction(string command, string description) {

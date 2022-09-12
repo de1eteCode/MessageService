@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.ComponentModel;
-
-namespace MessageService.Datas.Models;
+﻿namespace MessageService.Datas.Models;
 
 public class Chat {
     public string? ChatId { get; set; }
