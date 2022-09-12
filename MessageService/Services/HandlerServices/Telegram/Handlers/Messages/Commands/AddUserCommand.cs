@@ -59,6 +59,7 @@ public class AddUserCommand : BotCommandAction {
             }
 
             var newUser = new Datas.Models.User() {
+                Id = "@" + tgUserName,
                 Name = tgUserName,
                 Role = selectedRoleUser,
                 RoleId = selectedRoleUser.RoleId
