@@ -1,5 +1,4 @@
-﻿using MessageService.Datas;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Commands;

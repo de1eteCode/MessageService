@@ -23,6 +23,8 @@ public class DataContext : DbContext {
                 RoleName = "Пользователь"
             });
 
+        modelBuilder.Entity<Chat>().Property(e => e.IsJoined).HasDefaultValue(true);
+
         base.OnModelCreating(modelBuilder);
     }
 

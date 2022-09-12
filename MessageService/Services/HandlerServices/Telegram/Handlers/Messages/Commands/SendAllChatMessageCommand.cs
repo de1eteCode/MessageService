@@ -15,10 +15,6 @@ public class SendAllChatMessageCommand : BotCommandAction {
     }
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
-        if (message.Chat.Type != ChatType.Private) {
-            return;
-        }
-
         var msgToSend = message.Text;
 
         if (string.IsNullOrEmpty(msgToSend)) {
@@ -27,14 +23,14 @@ public class SendAllChatMessageCommand : BotCommandAction {
         }
 
         var context = _dbService.GetDBContext();
-        var chats = context.Chats.Select(e => e.ChatId);
+        var chats = context.Chats.Where(e => e.IsJoined).Select(e => e.ChatId);
 
         var groupSended = 0;
         var rnd = new Random();
 
         if (chats.Any()) {
-            await chats.ForEachAsync(async id => {
-                var msg = await botClient.SendTextMessageAsync(id!, msgToSend!);
+            await chats.ForEachAsync(id => {
+                var msg = botClient.SendTextMessageAsync(id!, msgToSend!);
                 if (msg != null) {
                     Interlocked.Increment(ref groupSended);
                 }

@@ -19,7 +19,7 @@ public class ForgetChat {
         _logger = logger;
     }
 
-    internal async Task Execute(Message message) {
+    public async Task ExecuteActionAsync(Message message) {
         var leftMember = message.LeftChatMember!;
         var iam = await _whoIam.GetMeAsync();
         if (leftMember.Id == iam.Id) {
@@ -27,10 +27,14 @@ public class ForgetChat {
 
             var context = _dbService.GetDBContext();
 
-            var findedChat = context.Chats.FirstOrDefault(e => e.ChatId.Equals(chatId.ToString()));
+            var findedChat = context.Chats.FirstOrDefault(e => e.ChatId!.Equals(chatId.ToString()));
 
             if (findedChat != null) {
-                context.Entry(findedChat).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+                findedChat.IsJoined = false;
+                findedChat.KickedTime = message.Date;
+                findedChat.KickedByUserLogin = message.From?.Username ?? "unknow";
+
+                context.Entry(findedChat).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                 await context.SaveChangesAsync();
                 _logger.LogInformation($"Меня выгнали из группы {findedChat.Name} :с");
             }

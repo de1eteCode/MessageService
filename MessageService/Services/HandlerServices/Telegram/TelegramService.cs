@@ -1,4 +1,4 @@
-﻿using MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Commands;
+﻿using MessageService.Services.HandlerServices.Telegram.Handlers.Messages;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -49,7 +49,8 @@ public class TelegramService : ITelegramService, IWhoIam, ITelegramSenderMessage
     /// Метод, предоставляемый <see cref="IHostedService"/>
     /// </summary>
     public Task StartAsync(CancellationToken cancellationToken) {
-        _telegramClient.SetMyCommandsAsync(_serviceProvider.GetServices<BotCommandAction>(), cancellationToken: _tokenSource.Token);
+        var commandsBot = _serviceProvider.GetServices<BotCommandAction>();
+        _telegramClient.SetMyCommandsAsync(commandsBot, cancellationToken: _tokenSource.Token);
         _telegramClient.StartReceiving(HandleUpdateAsync, HandlePollingErrorAsync, _receiverOptions, _tokenSource.Token);
         _logger.LogInformation($"Запущен {nameof(TelegramService)}");
         IsStarted = true;

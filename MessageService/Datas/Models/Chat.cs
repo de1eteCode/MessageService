@@ -1,10 +1,14 @@
 ﻿using System.Collections;
+using System.ComponentModel;
 
 namespace MessageService.Datas.Models;
 
 public class Chat {
     public string? ChatId { get; set; }
     public string? Name { get; set; }
+    public bool IsJoined { get; set; }
+    public DateTime? KickedTime { get; set; }
+    public string? KickedByUserLogin { get; set; }
 
     public override bool Equals(object? obj) {
         if (obj == null)
