@@ -53,15 +53,15 @@ public class DataContext : DbContext {
         modelBuilder
             .Entity<ChatGroup>()
             .HasOne(e => e.Group)
-            .WithOne()
-            .HasForeignKey<ChatGroup>(e => e.GroupId)
+            .WithMany()
+            .HasForeignKey(e => e.GroupId)
             .IsRequired();
 
         modelBuilder
             .Entity<ChatGroup>()
             .HasOne(e => e.Chat)
-            .WithOne()
-            .HasForeignKey<ChatGroup>(e => e.ChatId)
+            .WithMany()
+            .HasForeignKey(e => e.ChatId)
             .IsRequired();
 
         #endregion Chat group configure

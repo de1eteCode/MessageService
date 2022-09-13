@@ -1,4 +1,6 @@
 ﻿using MessageService.Datas;
+using MessageService.Datas.Models;
+using MessageService.Services.HandlerServices.Telegram.Attributes;
 using MessageService.Services.HelperService;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
@@ -10,6 +12,7 @@ namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Com
 /// <summary>
 /// Рассылка сообщений по всем чатам
 /// </summary>
+[TelegramUserRole("Системный администратор")]
 public class SendAllChatMessageCommand : BotCommandAction {
     private readonly IDatabaseService<DataContext> _dbService;
 
@@ -28,18 +31,17 @@ public class SendAllChatMessageCommand : BotCommandAction {
         var context = _dbService.GetDBContext();
         var chats = context.Chats.Where(e => e.IsJoined).Select(e => e.ChatId);
 
-        var groupSended = 0;
-        var rnd = new Random();
+        var chatSended = 0;
 
         if (chats.Any()) {
             await chats.ForEachAsync(id => {
                 var msg = botClient.SendTextMessageAsync(id!, msgToSend!);
                 if (msg != null) {
-                    Interlocked.Increment(ref groupSended);
+                    Interlocked.Increment(ref chatSended);
                 }
             });
         }
 
-        await botClient.SendTextMessageAsync(message.Chat.Id, $"Сообщение отправлено в {groupSended} чатов");
+        await botClient.SendTextMessageAsync(message.Chat.Id, $"Сообщение отправлено в {chatSended} чатов");
     }
 }

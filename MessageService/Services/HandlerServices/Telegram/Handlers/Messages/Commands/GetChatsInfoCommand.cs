@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using MessageService.Datas;
+using MessageService.Services.HandlerServices.Telegram.Attributes;
 using MessageService.Services.HelperService;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
@@ -10,6 +11,7 @@ namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Com
 /// <summary>
 /// Получение информации о всех чатах, о которых знает бот
 /// </summary>
+[TelegramUserRole("Системный администратор")]
 public class GetChatsInfoCommand : BotCommandAction {
     private readonly IDatabaseService<DataContext> _dbService;
 

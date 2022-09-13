@@ -34,12 +34,15 @@ public static class TelegramServiceExtension {
         .AddTelegramValidator<TelegramUserRoleValidator>()
 
         // Commands, apply for message handler
-        .AddTelegramCommand<StartCommand>()
         .AddTelegramCommand<ReplyMeCommand>()
         .AddTelegramCommand<SendAllChatMessageCommand>()
         .AddTelegramCommand<GetChatsInfoCommand>()
+        .AddTelegramCommand<GetGroupsInfoCommand>()
         .AddTelegramCommand<LeaveChatByIdCommand>()
         .AddTelegramCommand<AddUserCommand>()
+        .AddTelegramCommand<AddGroupCommand>()
+        .AddTelegramCommand<AddChatToGroupCommand>()
+        .AddTelegramCommand<SendAllChatByGroupCommand>()
 
         // Chat members passive executeon
         .AddTransient<ForgetChat>()
