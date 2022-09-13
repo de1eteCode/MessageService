@@ -2,8 +2,8 @@
 using MessageService.Services.HandlerServices.Telegram.AttributeValidators;
 using MessageService.Services.HandlerServices.Telegram.Handlers;
 using MessageService.Services.HandlerServices.Telegram.Handlers.Messages;
-using MessageService.Services.HandlerServices.Telegram.Handlers.Messages.ChatMembers;
 using MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Commands;
+using MessageService.Services.HandlerServices.Telegram.Handlers.MyChatMembers;
 using Telegram.Bot.Types;
 
 namespace MessageService.Services.HandlerServices;
@@ -28,6 +28,7 @@ public static class TelegramServiceExtension {
     public static IServiceCollection AddTelegramHandler(this IServiceCollection services) => services
         // Handlers
         .AddTelegramHandler<Message, MessageHandler>()
+        .AddTelegramHandler<ChatMemberUpdated, MyChatMemberHandler>()
 
         // Validators
         .AddTelegramValidator<TelegramLoginValidator>()

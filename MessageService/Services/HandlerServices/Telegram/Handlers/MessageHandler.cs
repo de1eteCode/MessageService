@@ -1,7 +1,5 @@
 ﻿using MessageService.Services.HandlerServices.Telegram.Handlers.Messages;
-using MessageService.Services.HandlerServices.Telegram.Handlers.Messages.ChatMembers;
 using Telegram.Bot;
-using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -13,14 +11,12 @@ namespace MessageService.Services.HandlerServices.Telegram.Handlers;
 public class MessageHandler : IUpdateHandler<Message> {
     private readonly ILogger<MessageHandler> _logger;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IWhoIam _whoIam;
     private readonly IEnumerable<ITelegramValidator> _telegramValidators;
 
-    public MessageHandler(ILogger<MessageHandler> logger, IWhoIam whoIam, IEnumerable<ITelegramValidator> telegramValidators, IServiceProvider serviceProvider) {
+    public MessageHandler(ILogger<MessageHandler> logger, IEnumerable<ITelegramValidator> telegramValidators, IServiceProvider serviceProvider) {
         _logger = logger;
         _serviceProvider = serviceProvider;
         _telegramValidators = telegramValidators;
-        _whoIam = whoIam;
     }
 
     private async Task<bool> IsValidAndError<T>(User user, T obj, ITelegramBotClient botClient, ChatId id) where T : BotCommandAction {
@@ -43,16 +39,16 @@ public class MessageHandler : IUpdateHandler<Message> {
     }
 
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
+        // надстройка, чтобы команды работали только в личных сообщениях
+        if (message.Chat.Type != ChatType.Private) {
+            return;
+        }
+
         switch (message.Type) {
             case MessageType.Text:
                 var msgtxt = message.Text?.Split(' ').First() ?? String.Empty;
 
                 if (string.IsNullOrEmpty(msgtxt) || msgtxt.First().Equals('/') == false) {
-                    break;
-                }
-
-                // надстройка, чтобы команды работали только в личных сообщениях
-                if (message.Chat.Type != ChatType.Private) {
                     break;
                 }
 
@@ -71,20 +67,6 @@ public class MessageHandler : IUpdateHandler<Message> {
                     _logger.LogInformation("Not supported command: " + message.Text);
                 }
 
-                break;
-
-            case MessageType.GroupCreated:
-            case MessageType.ChatMembersAdded:
-                if (message.Type == MessageType.GroupCreated) { // <- if тут для того, чтоб избежать ошибки компиляции CS0163: Управление не может передаваться вниз от одной метки case к другой
-                    // При создании группы, в свойстве NewMembers - null. Необходимо добавить хотя бы бота, как нового участника, чтоб запомнил чат
-                    message.NewChatMembers = new User[] { await _whoIam.GetMeAsync() };
-                }
-
-                await _serviceProvider.GetService<RememberChat>()!.ExecuteActionAsync(message);
-                break;
-
-            case MessageType.ChatMemberLeft:
-                await _serviceProvider.GetService<ForgetChat>()!.ExecuteActionAsync(message);
                 break;
 
             default:

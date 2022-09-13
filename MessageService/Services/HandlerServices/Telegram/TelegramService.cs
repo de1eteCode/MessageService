@@ -29,6 +29,7 @@ public class TelegramService : ITelegramService, IWhoIam, ITelegramSenderMessage
     public TelegramService(IConfiguration configuration, ILogger<TelegramService> logger, IServiceProvider serviceProvider) {
         _supportedUpdates = new() {
             { UpdateType.Message, (client, update, ct) => GetHandlerForMessageType(client, update.Message, ct) },
+            { UpdateType.MyChatMember, (client, update, ct) => GetHandlerForMessageType(client, update.MyChatMember, ct) }
         };
 
         _logger = logger;
