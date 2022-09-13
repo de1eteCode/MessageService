@@ -1,4 +1,3 @@
-using MessageService.Data;
 using MessageService.Datas;
 using MessageService.Services.HandlerServices;
 using MessageService.Services.HelperService;
@@ -10,17 +9,15 @@ public class Program {
 
     public static void Main(string[] args) {
         var builder = WebApplication.CreateBuilder(args);
-
         // Add services to the container.
         builder.Services.AddDbContext<DataContext>(options => {
             options.UseNpgsql(builder.Configuration.GetConnectionString("psql"));
         });
-
         builder.Services.AddRazorPages();
         builder.Services.AddServerSideBlazor();
-        builder.Services.AddSingleton<WeatherForecastService>();
+        builder.Services.AddSingleton<Data.WeatherForecastService>();
 
-        builder.Services.AddTransient<IDatabaseService<DataContext>, ScopeDatabaseService>();
+        builder.Services.AddTransient<IDatabaseService<DataContext>, ScopeDatabaseService<DataContext>>();
 
         // Telegram service
         builder.Services.AddTelegramHandler();
