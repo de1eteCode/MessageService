@@ -15,7 +15,7 @@ namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Com
 public class AddUserCommand : BotCommandAction {
     private readonly IDatabaseService<DataContext> _dbService;
 
-    public AddUserCommand(IDatabaseService<DataContext> dbService) : base("adduser", "Добавление пользователя как оператора") {
+    public AddUserCommand(IDatabaseService<DataContext> dbService) : base("adduser", "Добавление пользователя") {
         _dbService = dbService;
     }
 

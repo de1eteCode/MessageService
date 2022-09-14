@@ -33,6 +33,7 @@ public class AddChatToGroupCommand : BotCommandAction {
         var groupIdStrToAdd = splited.Last();
         int groupIdToAdd = -1;
 
+        // парсинг идентификатора группы
         if (int.TryParse(groupIdStrToAdd, out groupIdToAdd) == false) {
             await botClient.SendTextMessageAsync(privateChatId, $"Хм, я думаю {groupIdStrToAdd} не похож на идентификатор группы");
             return;
@@ -40,12 +41,14 @@ public class AddChatToGroupCommand : BotCommandAction {
 
         var context = _dbService.GetDBContext();
 
+        // поиск чата по идентификатору
         var chat = await context.Chats.FirstOrDefaultAsync(e => e.ChatId == chatIdToAdd);
         if (chat == null) {
             await botClient.SendTextMessageAsync(privateChatId, $"Я не знаю о чате с идентификатором {chatIdToAdd}");
             return;
         }
 
+        // поиск группы по идентификатору
         var group = await context.Groups.FirstOrDefaultAsync(e => e.GroupId == groupIdToAdd);
         if (group == null) {
             await botClient.SendTextMessageAsync(privateChatId, $"У меня нет группы с идентификатором {groupIdToAdd}");
@@ -59,6 +62,7 @@ public class AddChatToGroupCommand : BotCommandAction {
             return;
         }
 
+        // создание записи
         chatToGroup = new ChatGroup() {
             Chat = chat,
             ChatId = chat.ChatId,

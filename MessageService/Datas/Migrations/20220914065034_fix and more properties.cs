@@ -1,24 +1,17 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MessageService.Migrations
+namespace MessageService.Datas.Migrations
 {
-    public partial class detailedconfiguremodel : Migration
+    public partial class fixandmoreproperties : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_ChatGroups_Chats_ChatId",
-                table: "ChatGroups");
-
-            migrationBuilder.DropIndex(
-                name: "IX_ChatGroups_ChatId",
-                table: "ChatGroups");
-
-            migrationBuilder.DropIndex(
-                name: "IX_ChatGroups_GroupId",
                 table: "ChatGroups");
 
             migrationBuilder.AlterColumn<string>(
@@ -81,6 +74,25 @@ namespace MessageService.Migrations
                 oldType: "text",
                 oldNullable: true);
 
+            migrationBuilder.AddColumn<bool>(
+                name: "IsJoined",
+                table: "Chats",
+                type: "boolean",
+                nullable: false,
+                defaultValue: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "KickedByUserLogin",
+                table: "Chats",
+                type: "text",
+                nullable: true);
+
+            migrationBuilder.AddColumn<DateTime>(
+                name: "KickedTime",
+                table: "Chats",
+                type: "timestamp with time zone",
+                nullable: true);
+
             migrationBuilder.AlterColumn<string>(
                 name: "ChatId",
                 table: "ChatGroups",
@@ -101,17 +113,15 @@ namespace MessageService.Migrations
                 .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn)
                 .OldAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-            migrationBuilder.CreateIndex(
-                name: "IX_ChatGroups_ChatId",
-                table: "ChatGroups",
-                column: "ChatId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChatGroups_GroupId",
-                table: "ChatGroups",
-                column: "GroupId",
-                unique: true);
+            migrationBuilder.InsertData(
+                table: "Roles",
+                columns: new[] { "RoleId", "RoleName" },
+                values: new object[,]
+                {
+                    { 1, "Системный администратор" },
+                    { 2, "Администратор" },
+                    { 3, "Пользователь" }
+                });
 
             migrationBuilder.AddForeignKey(
                 name: "FK_ChatGroups_Chats_ChatId",
@@ -128,13 +138,32 @@ namespace MessageService.Migrations
                 name: "FK_ChatGroups_Chats_ChatId",
                 table: "ChatGroups");
 
-            migrationBuilder.DropIndex(
-                name: "IX_ChatGroups_ChatId",
-                table: "ChatGroups");
+            migrationBuilder.DeleteData(
+                table: "Roles",
+                keyColumn: "RoleId",
+                keyValue: 1);
 
-            migrationBuilder.DropIndex(
-                name: "IX_ChatGroups_GroupId",
-                table: "ChatGroups");
+            migrationBuilder.DeleteData(
+                table: "Roles",
+                keyColumn: "RoleId",
+                keyValue: 2);
+
+            migrationBuilder.DeleteData(
+                table: "Roles",
+                keyColumn: "RoleId",
+                keyValue: 3);
+
+            migrationBuilder.DropColumn(
+                name: "IsJoined",
+                table: "Chats");
+
+            migrationBuilder.DropColumn(
+                name: "KickedByUserLogin",
+                table: "Chats");
+
+            migrationBuilder.DropColumn(
+                name: "KickedTime",
+                table: "Chats");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Name",
@@ -205,16 +234,6 @@ namespace MessageService.Migrations
                 oldType: "integer")
                 .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                 .OldAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityAlwaysColumn);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChatGroups_ChatId",
-                table: "ChatGroups",
-                column: "ChatId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChatGroups_GroupId",
-                table: "ChatGroups",
-                column: "GroupId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_ChatGroups_Chats_ChatId",

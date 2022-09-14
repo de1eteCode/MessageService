@@ -12,7 +12,7 @@ namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Com
 public class LeaveChatByIdCommand : BotCommandAction {
     private readonly IWhoIam _whoIam;
 
-    public LeaveChatByIdCommand(IWhoIam whoIam) : base("leavechatbyid", "Команда для выхода из чата ботом.") {
+    public LeaveChatByIdCommand(IWhoIam whoIam) : base("leavechatbyid", "Команда для выхода из чата ботом") {
         _whoIam = whoIam;
     }
 

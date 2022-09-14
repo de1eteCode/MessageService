@@ -28,11 +28,16 @@ public class AddGroupCommand : BotCommandAction {
             return;
         }
 
+        var context = _dbService.GetDBContext();
+        var addedGroupUser = await context.Users.FirstOrDefaultAsync(e => e.Name!.Equals(message.From!.Username));
+
         var newGroup = new Group() {
-            Title = msg
+            Title = msg,
+            Users = new List<Datas.Models.User>() {
+                addedGroupUser
+            }
         };
 
-        var context = _dbService.GetDBContext();
         context.Entry(newGroup).State = EntityState.Added;
         await context.SaveChangesAsync();
 

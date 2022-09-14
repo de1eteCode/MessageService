@@ -1,6 +1,5 @@
-﻿using MessageService.Datas.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ValueGeneration;
+﻿using Microsoft.EntityFrameworkCore;
+using MessageService.Datas.Models;
 
 namespace MessageService.Datas;
 
@@ -9,7 +8,17 @@ public class DataContext : DbContext {
     public DataContext(DbContextOptions options) : base(options) {
     }
 
+    public DbSet<Chat> Chats { get; set; } = default!;
+    public DbSet<Group> Groups { get; set; } = default!;
+    public DbSet<ChatGroup> ChatGroups { get; set; } = default!;
+    public DbSet<User> Users { get; set; } = default!;
+    public DbSet<Role> Roles { get; set; } = default!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        modelBuilder.Entity<Group>()
+            .HasMany(p => p.Users)
+            .WithMany(p => p.Groups)
+            .UsingEntity(j => j.ToTable("GroupUser"));
 
         #region Chat configure
 
@@ -134,13 +143,5 @@ public class DataContext : DbContext {
             .HasForeignKey(e => e.RoleId);
 
         #endregion User configure
-
-        base.OnModelCreating(modelBuilder);
     }
-
-    public DbSet<Chat> Chats { get; set; } = default!;
-    public DbSet<Group> Groups { get; set; } = default!;
-    public DbSet<ChatGroup> ChatGroups { get; set; } = default!;
-    public DbSet<User> Users { get; set; } = default!;
-    public DbSet<Role> Roles { get; set; } = default!;
 }
