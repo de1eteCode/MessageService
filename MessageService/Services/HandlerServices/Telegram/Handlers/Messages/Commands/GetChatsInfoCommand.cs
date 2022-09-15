@@ -22,12 +22,22 @@ public class GetChatsInfoCommand : BotCommandAction {
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
         var context = _dbService.GetDBContext();
 
-        var allChats = context.Chats.Where(e => e.IsJoined);
+        IQueryable<Datas.Models.Chat> allChats = context.Chats;
+
+        var msg = message.Text!;
+        if (string.IsNullOrEmpty(msg)) {
+            await botClient.SendTextMessageAsync(message.Chat.Id, "Есть возможность посмотреть все чаты: /getchatsinfo all");
+        }
+
+        if (msg.Equals("all") == false) {
+            allChats = allChats.Where(e => e.IsJoined);
+        }
 
         if (allChats.Any() == false) {
             await botClient.SendTextMessageAsync(message.Chat.Id, "Сейчас нет чатов, в которых я состаю");
             return;
         }
+
         var countChats = allChats.Count();
         await botClient.SendTextMessageAsync(message.Chat.Id, $"Вот что я знаю о своих чатах, их всего {countChats}. {(countChats > 5 ? "Готовтесь к спаму с:" : "")}");
 
