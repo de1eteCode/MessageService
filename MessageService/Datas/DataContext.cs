@@ -41,11 +41,6 @@ public class DataContext : DbContext {
             .Property(e => e.KickedByUserLogin)
             .IsRequired(false);
 
-        modelBuilder
-            .Entity<Chat>()
-            .Property(e => e.IsJoined)
-            .HasDefaultValue(true);
-
         #endregion Chat configure
 
         #region Chat group configure

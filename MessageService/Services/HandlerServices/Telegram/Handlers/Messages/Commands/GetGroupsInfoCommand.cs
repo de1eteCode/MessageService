@@ -20,8 +20,21 @@ public class GetGroupsInfoCommand : BotCommandAction {
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
         var context = _dbService.GetDBContext();
-        var groups = context.Groups;
+
+        var user = await context.Users.FirstOrDefaultAsync(e => e.Name == message.From!.Username);
+        if (user == null) {
+            await botClient.SendTextMessageAsync(message.Chat.Id, "Странно, я не нашел тебя в своей базе данных");
+            return;
+        }
+
+        var groups = context.Groups.Where(e => e.Users!.Any(s => s.Id == user.Id));
         var count = await groups.CountAsync();
+
+        if (count < 1) {
+            await botClient.SendTextMessageAsync(message.Chat.Id, "Ты не состоишь не в одной группе");
+            return;
+        }
+
         await botClient.SendTextMessageAsync(message.Chat.Id, $"Вот что я знаю о группах, их всего {count}. {(count > 5 ? "Готовтесь к спаму с:" : "")}");
         await groups.ForEachAsync(group => {
             botClient.SendTextMessageAsync(message.Chat.Id, String.Format("{0} - {1}", group.GroupId, group.Title));

@@ -41,9 +41,11 @@ public static class TelegramServiceExtension {
         .AddTelegramCommand<GetGroupsInfoCommand>()
         .AddTelegramCommand<LeaveChatByIdCommand>()
         .AddTelegramCommand<AddUserCommand>()
+        .AddTelegramCommand<ChangeUserCommand>()
         .AddTelegramCommand<AddGroupCommand>()
         .AddTelegramCommand<AddChatToGroupCommand>()
         .AddTelegramCommand<SendAllChatByGroupCommand>()
+        .AddTelegramCommand<RemoveChatFromGroupCommand>()
 
         // Chat members passive executeon
         .AddTransient<ForgetChat>()

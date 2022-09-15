@@ -79,7 +79,7 @@ public class AddUserCommand : BotCommandAction {
 
         Task SendDefaultMsg() {
             return botClient.SendTextMessageAsync(chatId,
-                "Синтаксис для добавления пользователя: /adduser [Логин в телеграм] [Роль]\n" +
+                "Синтаксис для добавления пользователя: /adduser [tg username] [id роль]\n" +
                 "Доступные роли:\n" +
                 String.Join("\n", roles.Select(e => String.Join(" - ", e.RoleId, e.RoleName))));
         }

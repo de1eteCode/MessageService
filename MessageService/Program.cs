@@ -11,6 +11,7 @@ public class Program {
         var builder = WebApplication.CreateBuilder(args);
         // Add services to the container.
         builder.Services.AddDbContext<DataContext>(options => {
+            options.UseLazyLoadingProxies();
             options.UseNpgsql(builder.Configuration.GetConnectionString("psql"));
         });
         builder.Services.AddRazorPages();

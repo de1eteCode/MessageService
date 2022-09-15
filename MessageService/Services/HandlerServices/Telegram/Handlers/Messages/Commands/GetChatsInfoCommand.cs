@@ -36,21 +36,22 @@ public class GetChatsInfoCommand : BotCommandAction {
             var chatInfo = botClient.GetChatAsync(chatModel.ChatId!).Result;
             threadSB.AppendLine("ID: " + chatInfo.Id);
             threadSB.AppendLine("Имя: " + chatInfo.Title);
-            if (chatInfo != null) {
-                var myPermis = chatInfo.Permissions;
-                if (myPermis != null) {
-                    threadSB.AppendLine("Мои привелегии в чате:");
-                    threadSB.AppendLine("Могу отправлять сообщения: " + GetRuYesORNo(myPermis.CanSendMessages ?? false));
-                    threadSB.AppendLine("Могу отправлять медиа сообщения: " + GetRuYesORNo(myPermis.CanSendMediaMessages ?? false));
-                    threadSB.AppendLine("Могу отправлять другие сообщения: " + GetRuYesORNo(myPermis.CanSendOtherMessages ?? false));
-                    threadSB.AppendLine("Могу изменять информацию: " + GetRuYesORNo(myPermis.CanChangeInfo ?? false));
-                    threadSB.AppendLine("Могу приглашать: " + GetRuYesORNo(myPermis.CanInviteUsers ?? false));
-                    threadSB.AppendLine("Могу закреплять сообщения: " + GetRuYesORNo(myPermis.CanPinMessages ?? false));
-                }
-            }
-            else {
-                threadSB.AppendLine($"О чате {chatModel.Name} ({chatModel.ChatId!}) не нашел информацию. \n");
-            }
+            threadSB.AppendLine("Статус: " + (chatModel.IsJoined ? "состою в чате" : $"меня выгнал {chatModel.KickedByUserLogin}, дата {(chatModel.KickedTime != null ? chatModel.KickedTime.Value.ToString("F") : "не найдена")}"));
+            //if (chatInfo != null) {
+            //    var myPermis = chatInfo.Permissions;
+            //    if (myPermis != null) {
+            //        threadSB.AppendLine("Мои привелегии в чате:");
+            //        threadSB.AppendLine("Могу отправлять сообщения: " + GetRuYesORNo(myPermis.CanSendMessages ?? false));
+            //        threadSB.AppendLine("Могу отправлять медиа сообщения: " + GetRuYesORNo(myPermis.CanSendMediaMessages ?? false));
+            //        threadSB.AppendLine("Могу отправлять другие сообщения: " + GetRuYesORNo(myPermis.CanSendOtherMessages ?? false));
+            //        threadSB.AppendLine("Могу изменять информацию: " + GetRuYesORNo(myPermis.CanChangeInfo ?? false));
+            //        threadSB.AppendLine("Могу приглашать: " + GetRuYesORNo(myPermis.CanInviteUsers ?? false));
+            //        threadSB.AppendLine("Могу закреплять сообщения: " + GetRuYesORNo(myPermis.CanPinMessages ?? false));
+            //    }
+            //}
+            //else {
+            //    threadSB.AppendLine($"О чате {chatModel.Name} ({chatModel.ChatId!}) не нашел информацию. \n");
+            //}
 
             botClient.SendTextMessageAsync(message.Chat.Id, threadSB.ToString());
         });

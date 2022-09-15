@@ -55,6 +55,18 @@ public class AddChatToGroupCommand : BotCommandAction {
             return;
         }
 
+        // проверка пользователя на наличие в группе
+        var user = await context.Users.FirstOrDefaultAsync(e => e.Name == message.From!.Username);
+        if (user == null) {
+            await botClient.SendTextMessageAsync(privateChatId, $"Странно, я не нашел твою учетку в своей базе данных");
+            return;
+        }
+
+        if (group.Users!.Any(e => e.Id == user.Id) == false) {
+            await botClient.SendTextMessageAsync(privateChatId, $"Ты не можешь добавлять чаты в группу, в которой не состоишь");
+            return;
+        }
+
         // проверка наличия чата в группе
         var chatToGroup = await context.ChatGroups.FirstOrDefaultAsync(e => e.ChatId!.Equals(chat.ChatId) && e.GroupId == group.GroupId);
         if (chatToGroup != null) {
