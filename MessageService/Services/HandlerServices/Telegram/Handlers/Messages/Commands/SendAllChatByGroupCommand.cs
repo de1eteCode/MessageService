@@ -57,13 +57,13 @@ public class SendAllChatByGroupCommand : BotCommandAction {
             }
 
             // рассылка сообщений
-            var chats = context.Chats.Where(e => context.ChatGroups.Any(g => g.GroupId == groupId && g.ChatId!.Equals(e.ChatId)));
+            var chatIds = context.ChatGroups.Where(e => e.GroupId == groupId && e.IsDeleted == false).Select(e => e.ChatId!);
 
             var chatSended = 0;
 
-            if (chats.Any()) {
-                await chats.ForEachAsync(chat => {
-                    var msg = botClient.SendTextMessageAsync(chat.ChatId!, msgToSend!);
+            if (chatIds.Any()) {
+                await chatIds.ForEachAsync(chatId => {
+                    var msg = botClient.SendTextMessageAsync(chatId, msgToSend!);
                     if (msg != null) {
                         Interlocked.Increment(ref chatSended);
                     }

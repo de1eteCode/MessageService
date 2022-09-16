@@ -35,13 +35,13 @@ public class ChangeUserCommand : BotCommandAction {
             return;
         }
 
-        var tgUserName = splitedText.First();
+        var idTelegramStr = splitedText.First();
 
         // проверка на наличие такого пользователя
-        var userForChange = await context.Users.FirstOrDefaultAsync(e => e.Name!.Equals(tgUserName));
+        var userForChange = await context.Users.FirstOrDefaultAsync(e => e.Id!.Equals(idTelegramStr));
 
         if (userForChange == null) {
-            await botClient.SendTextMessageAsync(privateChatId, $"Пользователь {tgUserName} не найден");
+            await botClient.SendTextMessageAsync(privateChatId, $"Пользователь {idTelegramStr} не найден");
             return;
         }
 

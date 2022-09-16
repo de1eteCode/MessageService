@@ -31,24 +31,29 @@ public class AddUserCommand : BotCommandAction {
             return;
         }
 
-        var splitedText = msgText.Split(new char[] { ' ' }, 2);
+        var splitedText = msgText.Split(new char[] { ' ' });
 
-        if (splitedText.Length != 2) {
+        if (splitedText.Length < 3) {
             await SendDefaultMsg();
             return;
         }
 
-        var tgUserName = splitedText.First();
+        var idTelegramStr = splitedText[(int)PositionArgs.TelegramId];
+        ulong idTelegram;
+        if (ulong.TryParse(idTelegramStr, out idTelegram) == false) {
+            await botClient.SendTextMessageAsync(chatId, $"{idTelegramStr} не похож на идентификатор пользователя Telegram");
+            return;
+        }
 
         // проверка на наличие такого пользователя
-        var addedUser = await context.Users.FirstOrDefaultAsync(e => e.Name!.Equals(tgUserName));
+        var addedUser = await context.Users.FirstOrDefaultAsync(e => e.Id!.Equals(idTelegram));
 
         if (addedUser != null) {
             await botClient.SendTextMessageAsync(chatId, $"Пользователь {addedUser.Name} был ранее добавлен");
             return;
         }
 
-        var roleId = splitedText.Last();
+        var roleId = splitedText[(int)PositionArgs.RoleId];
 
         if (int.TryParse(roleId, out int roleIdNum)) {
             var selectedRoleUser = roles.FirstOrDefault(e => e.RoleId == roleIdNum);
@@ -59,8 +64,8 @@ public class AddUserCommand : BotCommandAction {
             }
 
             var newUser = new Datas.Models.User() {
-                Id = "@" + tgUserName,
-                Name = tgUserName,
+                Id = idTelegram.ToString(),
+                Name = String.Join(" ", splitedText.Skip((int)PositionArgs.Name)),
                 Role = selectedRoleUser,
                 RoleId = selectedRoleUser.RoleId
             };
@@ -79,9 +84,15 @@ public class AddUserCommand : BotCommandAction {
 
         Task SendDefaultMsg() {
             return botClient.SendTextMessageAsync(chatId,
-                "Синтаксис для добавления пользователя: /adduser [tg username] [id роль]\n" +
+                "Синтаксис для добавления пользователя: /adduser [id роль] [id telegram] [Имя]\n" +
                 "Доступные роли:\n" +
                 String.Join("\n", roles.Select(e => String.Join(" - ", e.RoleId, e.RoleName))));
         }
+    }
+
+    private enum PositionArgs : int {
+        RoleId = 0,
+        TelegramId = 1,
+        Name = 2
     }
 }

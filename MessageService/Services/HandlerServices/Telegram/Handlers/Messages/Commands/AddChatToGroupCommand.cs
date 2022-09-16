@@ -28,7 +28,12 @@ public class AddChatToGroupCommand : BotCommandAction {
             return;
         }
 
-        var splited = msg.Split(" ", 2);
+        var splited = msg.Split(" ");
+        if (splited.Length != 2) {
+            await SendDefaultMessage();
+            return;
+        }
+
         var chatIdToAdd = splited.First();
         var groupIdStrToAdd = splited.Last();
         int groupIdToAdd = -1;
@@ -70,23 +75,29 @@ public class AddChatToGroupCommand : BotCommandAction {
         // проверка наличия чата в группе
         var chatToGroup = await context.ChatGroups.FirstOrDefaultAsync(e => e.ChatId!.Equals(chat.ChatId) && e.GroupId == group.GroupId);
         if (chatToGroup != null) {
-            await botClient.SendTextMessageAsync(privateChatId, $"Чат \"{chat.Name}\" уже состоит в группе \"{group.Title}\"");
-            return;
+            // если имеется 
+            if (chatToGroup.IsDeleted) {
+                chatToGroup.IsDeleted = false;
+                context.Entry(chatToGroup).State = EntityState.Modified;
+            }
+            else {
+                await botClient.SendTextMessageAsync(privateChatId, $"Чат \"{chat.Name}\" уже состоит в группе \"{group.Title}\"");
+                return;
+            }
+        }
+        else {
+            chatToGroup = new ChatGroup() {
+                Chat = chat,
+                ChatId = chat.ChatId,
+                Group = group,
+                GroupId = group.GroupId,
+                IsDeleted = false
+            };
+
+            context.Entry(chatToGroup).State = EntityState.Added;
         }
 
-        // создание записи
-        chatToGroup = new ChatGroup() {
-            Chat = chat,
-            ChatId = chat.ChatId,
-            Group = group,
-            GroupId = group.GroupId
-        };
-
-        context.Entry(chatToGroup).State = EntityState.Added;
-        context.Entry(chat).State = EntityState.Unchanged;
-        context.Entry(group).State = EntityState.Unchanged;
         await context.SaveChangesAsync();
-
         await botClient.SendTextMessageAsync(privateChatId, $"Чат \"{chat.Name}\" успешно добавлен в группу \"{group.Title}\"");
 
         return;

@@ -28,7 +28,7 @@ public class TelegramUserRoleValidator : BaseValidator<TelegramUserRoleAttribute
 
         var context = _dbService.GetDBContext();
 
-        var userModel = await context.Users.Where(e => e.Name!.Equals(user.Username)).FirstOrDefaultAsync();
+        var userModel = await context.Users.FirstOrDefaultAsync(e => e.Id!.Equals(user.Id.ToString()));
 
         if (userModel == null) {
             // нет пользователя, значит нет ролей, значит доступ запрещен

@@ -14,7 +14,7 @@ namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Com
 public class GetGroupsInfoCommand : BotCommandAction {
     private readonly IDatabaseService<DataContext> _dbService;
 
-    public GetGroupsInfoCommand(IDatabaseService<DataContext> dbService) : base("getgroupsinfo", "Получение информации о всех группах") {
+    public GetGroupsInfoCommand(IDatabaseService<DataContext> dbService) : base("getgroupsinfo", "Получение информации о всех группах, в которых состоишь") {
         _dbService = dbService;
     }
 
@@ -35,7 +35,7 @@ public class GetGroupsInfoCommand : BotCommandAction {
             return;
         }
 
-        await botClient.SendTextMessageAsync(message.Chat.Id, $"Вот что я знаю о группах, их всего {count}. {(count > 5 ? "Готовтесь к спаму с:" : "")}");
+        await botClient.SendTextMessageAsync(message.Chat.Id, $"Вот что я знаю о группах, в которых ты состоишь, их всего {count}. {(count > 5 ? "Готовтесь к спаму с:" : "")}");
         await groups.ForEachAsync(group => {
             botClient.SendTextMessageAsync(message.Chat.Id, String.Format("{0} - {1}", group.GroupId, group.Title));
         });

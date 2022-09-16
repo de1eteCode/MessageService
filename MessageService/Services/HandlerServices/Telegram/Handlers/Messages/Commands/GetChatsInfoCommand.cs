@@ -4,6 +4,7 @@ using MessageService.Services.HandlerServices.Telegram.Attributes;
 using MessageService.Services.HelperService;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 
 namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Commands;
@@ -41,12 +42,25 @@ public class GetChatsInfoCommand : BotCommandAction {
         var countChats = allChats.Count();
         await botClient.SendTextMessageAsync(message.Chat.Id, $"Вот что я знаю о своих чатах, их всего {countChats}. {(countChats > 5 ? "Готовтесь к спаму с:" : "")}");
 
+        var stringBuilder = new StringBuilder();
+
         await allChats.ForEachAsync(chatModel => {
             var threadSB = new StringBuilder();
-            var chatInfo = botClient.GetChatAsync(chatModel.ChatId!).Result;
-            threadSB.AppendLine("ID: " + chatInfo.Id);
-            threadSB.AppendLine("Имя: " + chatInfo.Title);
-            threadSB.AppendLine("Статус: " + (chatModel.IsJoined ? "состою в чате" : $"меня выгнал {chatModel.KickedByUserLogin}, дата {(chatModel.KickedTime != null ? chatModel.KickedTime.Value.ToString("F") : "не найдена")}"));
+            threadSB.AppendLine("ID: " + chatModel.ChatId);
+            threadSB.AppendLine("Имя: " + chatModel.Name);
+            if (chatModel.IsJoined) {
+                try {
+                    var chatInfo = botClient.GetChatAsync(chatModel.ChatId!).Result;
+                    threadSB.AppendLine("Статус: состою в чате");
+                }
+                catch (AggregateException ex) when (ex.InnerException!.GetType() == typeof(ApiRequestException) && ((ApiRequestException)ex.InnerException).ErrorCode == 400) { // Not found exception
+                    threadSB.AppendLine("Статус: в базе написано что состою, но не состою");
+                }
+            }
+            else {
+                threadSB.AppendLine($"Статус: меня выгнал {chatModel.KickedByUserLogin}, дата {(chatModel.KickedTime != null ? chatModel.KickedTime.Value.ToString("F") : "не найдена")}");
+            }
+
             //if (chatInfo != null) {
             //    var myPermis = chatInfo.Permissions;
             //    if (myPermis != null) {
@@ -62,9 +76,9 @@ public class GetChatsInfoCommand : BotCommandAction {
             //else {
             //    threadSB.AppendLine($"О чате {chatModel.Name} ({chatModel.ChatId!}) не нашел информацию. \n");
             //}
-
-            botClient.SendTextMessageAsync(message.Chat.Id, threadSB.ToString());
+            stringBuilder.AppendLine(threadSB.ToString());
         });
+        await botClient.SendTextMessageAndSplitIfOverfullAsync(message.Chat.Id, stringBuilder.ToString());
     }
 
     private string GetRuYesORNo(bool status) {

@@ -61,20 +61,21 @@ public class RemoveChatFromGroupCommand : BotCommandAction {
             return;
         }
 
-        if (group.Users!.Any(e => e.Id == user.Id)) {
+        if (group.Users!.Any(e => e.Id == user.Id) == false) {
             await botClient.SendTextMessageAsync(privateChatId, $"Ты не можешь удалять чаты из группы, в которой не состоишь");
             return;
         }
 
         // проверка наличия чата в группе
-        var chatToGroup = await context.ChatGroups.FirstOrDefaultAsync(e => e.ChatId!.Equals(chat.ChatId) && e.GroupId == group.GroupId);
+        var chatToGroup = await context.ChatGroups.FirstOrDefaultAsync(e => e.ChatId!.Equals(chat.ChatId) && e.GroupId == group.GroupId && e.IsDeleted == false);
         if (chatToGroup == null) {
             await botClient.SendTextMessageAsync(privateChatId, $"Чат \"{chat.Name}\" не состоит в группе \"{group.Title}\"");
             return;
         }
 
-        // удаление
-        context.Entry(chatToGroup).State = EntityState.Deleted;
+        chatToGroup.IsDeleted = true;
+        // пометка "удален"
+        context.Entry(chatToGroup).State = EntityState.Modified;
         await context.SaveChangesAsync();
 
         await botClient.SendTextMessageAsync(privateChatId, $"Чат \"{chat.Name}\" успешно удален из группы \"{group.Title}\"");
@@ -84,7 +85,8 @@ public class RemoveChatFromGroupCommand : BotCommandAction {
         Task SendDefaultMessage() {
             return botClient.SendTextMessageAsync(privateChatId,
                 "Синтаксис удаления чата из группы /removechatfromgroup [id чата] [id группы]\n" +
-                "Узнать доступные группы: /getgroupsinfo");
+                "Узнать доступные группы: /getgroupsinfo\n" +
+                "Узнать чаты в группе: /getchatinfo [id группы]");
         }
     }
 }
