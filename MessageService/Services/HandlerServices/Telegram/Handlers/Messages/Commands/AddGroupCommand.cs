@@ -29,7 +29,7 @@ public class AddGroupCommand : BotCommandAction {
         }
 
         var context = _dbService.GetDBContext();
-        var addedGroupUser = await context.Users.FirstOrDefaultAsync(e => e.Name!.Equals(message.From!.Username));
+        var addedGroupUser = await context.Users.FirstOrDefaultAsync(e => e.Id!.Equals(message.From!.Id.ToString()));
 
         if (addedGroupUser == null) {
             await botClient.SendTextMessageAsync(chatId, "Странно, я не нашел твоей учетной записи у себя в базе");

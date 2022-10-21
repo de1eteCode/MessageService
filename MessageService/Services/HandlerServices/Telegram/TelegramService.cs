@@ -1,4 +1,8 @@
-﻿using MessageService.Services.HandlerServices.Telegram.Handlers.Messages;
+﻿using System.Diagnostics;
+using MessageService.Models;
+using MessageService.Services.HandlerServices.Telegram.Handlers.Messages;
+using Microsoft.Extensions.Options;
+using RPSLimitTelegramBotLibrary.Telegram;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
@@ -26,7 +30,7 @@ public class TelegramService : ITelegramService, IWhoIam, ITelegramSenderMessage
     public bool IsStarted { get; private set; }
     public TelegramBotClient TelegramBot => _telegramClient;
 
-    public TelegramService(IConfiguration configuration, ILogger<TelegramService> logger, IServiceProvider serviceProvider) {
+    public TelegramService(ILogger<TelegramService> logger, IOptionsMonitor<TelegramSettings> optionsMonitor, IServiceProvider serviceProvider) {
         _supportedUpdates = new() {
             { UpdateType.Message, (client, update, ct) => GetHandlerForMessageType(client, update.Message, ct) },
             { UpdateType.MyChatMember, (client, update, ct) => GetHandlerForMessageType(client, update.MyChatMember, ct) }
@@ -39,8 +43,13 @@ public class TelegramService : ITelegramService, IWhoIam, ITelegramSenderMessage
             AllowedUpdates = _supportedUpdates.Keys.ToArray()
         };
 
+        var options = optionsMonitor.CurrentValue;
+
         _tokenSource = new CancellationTokenSource();
-        _telegramClient = new TelegramBotClient(configuration["TelegramToken"]);
+        _telegramClient = new TelegramBotClientLimit(options.Token) {
+            Rate = options.LimitRequests,
+            TimeForOperation = TimeSpan.FromSeconds(1)
+        };
     }
 
     #region Service method
@@ -79,7 +88,7 @@ public class TelegramService : ITelegramService, IWhoIam, ITelegramSenderMessage
     /// <param name="cancellationToken">Токен отмены операции</param>
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken) {
         if (_supportedUpdates.TryGetValue(update.Type, out var handler)) {
-            await handler(botClient, update, cancellationToken);
+            await handler(botClient, update, cancellationToken).ConfigureAwait(false);
         }
         else {
             _logger.LogError($"Handle update unsupported type: {update.Type}");

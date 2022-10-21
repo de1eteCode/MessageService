@@ -55,7 +55,7 @@ public class RemoveChatFromGroupCommand : BotCommandAction {
         }
 
         // проверка пользователя на наличие в группе
-        var user = await context.Users.FirstOrDefaultAsync(e => e.Name == message.From!.Username);
+        var user = await context.Users.FirstOrDefaultAsync(e => e.Id == message.From!.Id.ToString());
         if (user == null) {
             await botClient.SendTextMessageAsync(privateChatId, $"Странно, я не нашел твою учетку в своей базе данных");
             return;

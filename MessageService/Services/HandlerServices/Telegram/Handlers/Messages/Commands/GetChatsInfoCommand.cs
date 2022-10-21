@@ -1,8 +1,11 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using MessageService.Datas;
+using MessageService.Models;
 using MessageService.Services.HandlerServices.Telegram.Attributes;
 using MessageService.Services.HelperService;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
@@ -15,12 +18,16 @@ namespace MessageService.Services.HandlerServices.Telegram.Handlers.Messages.Com
 [TelegramUserRole("Системный администратор")]
 public class GetChatsInfoCommand : BotCommandAction {
     private readonly IDatabaseService<DataContext> _dbService;
+    private readonly TelegramSettings _tgConfiguration;
 
-    public GetChatsInfoCommand(IDatabaseService<DataContext> dbService) : base("getchatsinfo", "Получение информации о всех чатах, которые есть в БД") {
+    public GetChatsInfoCommand(IDatabaseService<DataContext> dbService, IOptionsMonitor<TelegramSettings> optionsMonitor) : base("getchatsinfo", "Получение информации о всех чатах, которые есть в БД") {
         _dbService = dbService;
+        _tgConfiguration = optionsMonitor.CurrentValue;
     }
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
         var context = _dbService.GetDBContext();
 
         IQueryable<Datas.Models.Chat> allChats = context.Chats;
@@ -44,44 +51,36 @@ public class GetChatsInfoCommand : BotCommandAction {
 
         var stringBuilder = new StringBuilder();
 
-        await allChats.ForEachAsync(chatModel => {
-            var threadSB = new StringBuilder();
-            threadSB.AppendLine("ID: " + chatModel.ChatId);
-            threadSB.AppendLine("Имя: " + chatModel.Name);
-            if (chatModel.IsJoined) {
-                try {
-                    var chatInfo = botClient.GetChatAsync(chatModel.ChatId!).Result;
-                    threadSB.AppendLine("Статус: состою в чате");
-                }
-                catch (AggregateException ex) when (ex.InnerException!.GetType() == typeof(ApiRequestException) && ((ApiRequestException)ex.InnerException).ErrorCode == 400) { // Not found exception
-                    threadSB.AppendLine("Статус: в базе написано что состою, но не состою");
-                }
-            }
-            else {
-                threadSB.AppendLine($"Статус: меня выгнал {chatModel.KickedByUserLogin}, дата {(chatModel.KickedTime != null ? chatModel.KickedTime.Value.ToString("F") : "не найдена")}");
-            }
+        var tasks = (await allChats.ToListAsync()).Select(chatModel => BuildBlockInfoChat(chatModel, botClient));
 
-            //if (chatInfo != null) {
-            //    var myPermis = chatInfo.Permissions;
-            //    if (myPermis != null) {
-            //        threadSB.AppendLine("Мои привелегии в чате:");
-            //        threadSB.AppendLine("Могу отправлять сообщения: " + GetRuYesORNo(myPermis.CanSendMessages ?? false));
-            //        threadSB.AppendLine("Могу отправлять медиа сообщения: " + GetRuYesORNo(myPermis.CanSendMediaMessages ?? false));
-            //        threadSB.AppendLine("Могу отправлять другие сообщения: " + GetRuYesORNo(myPermis.CanSendOtherMessages ?? false));
-            //        threadSB.AppendLine("Могу изменять информацию: " + GetRuYesORNo(myPermis.CanChangeInfo ?? false));
-            //        threadSB.AppendLine("Могу приглашать: " + GetRuYesORNo(myPermis.CanInviteUsers ?? false));
-            //        threadSB.AppendLine("Могу закреплять сообщения: " + GetRuYesORNo(myPermis.CanPinMessages ?? false));
-            //    }
-            //}
-            //else {
-            //    threadSB.AppendLine($"О чате {chatModel.Name} ({chatModel.ChatId!}) не нашел информацию. \n");
-            //}
-            stringBuilder.AppendLine(threadSB.ToString());
-        });
+        Task.WaitAll(tasks.ToArray());
+
+        foreach (var task in tasks) {
+            if (task.IsCompletedSuccessfully) {
+                stringBuilder.AppendLine(task.Result);
+            }
+        }
+        stopwatch.Stop();
         await botClient.SendTextMessageAndSplitIfOverfullAsync(message.Chat.Id, stringBuilder.ToString());
+        await botClient.SendTextMessageAsync(message.Chat.Id, stopwatch.Elapsed.ToString());
     }
 
-    private string GetRuYesORNo(bool status) {
-        return status ? "Да" : "Нет";
+    private Task<string> BuildBlockInfoChat(Datas.Models.Chat chatModel, ITelegramBotClient botClient) {
+        var strBuilder = new StringBuilder();
+        strBuilder.AppendLine("ID: " + chatModel.ChatId);
+        strBuilder.AppendLine("Имя: " + chatModel.Name);
+        if (chatModel.IsJoined) {
+            try {
+                var chatInfo = botClient.GetChatAsync(chatModel.ChatId!).Result;
+                strBuilder.AppendLine("Статус: состою в чате");
+            }
+            catch (AggregateException ex) when (ex.InnerException!.GetType() == typeof(ApiRequestException) && ((ApiRequestException)ex.InnerException).ErrorCode == 400) { // Not found exception
+                strBuilder.AppendLine("Статус: в базе написано что состою, но не состою");
+            }
+        }
+        else {
+            strBuilder.AppendLine($"Статус: меня выгнал {chatModel.KickedByUserLogin}, дата {(chatModel.KickedTime != null ? chatModel.KickedTime.Value.ToString("F") : "не найдена")}");
+        }
+        return Task.FromResult(strBuilder.ToString());
     }
 }

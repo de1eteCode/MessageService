@@ -1,4 +1,5 @@
 using MessageService.Datas;
+using MessageService.Models;
 using MessageService.Services.HandlerServices;
 using MessageService.Services.HelperService;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,9 @@ public class Program {
 
     public static void Main(string[] args) {
         var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelegramSettings"));
+
         // Add services to the container.
         builder.Services.AddDbContext<DataContext>(options => {
             options.UseLazyLoadingProxies();

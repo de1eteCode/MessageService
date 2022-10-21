@@ -21,7 +21,7 @@ public class GetGroupsInfoCommand : BotCommandAction {
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
         var context = _dbService.GetDBContext();
 
-        var user = await context.Users.FirstOrDefaultAsync(e => e.Name == message.From!.Username);
+        var user = await context.Users.FirstOrDefaultAsync(e => e.Id == message.From!.Id.ToString());
         if (user == null) {
             await botClient.SendTextMessageAsync(message.Chat.Id, "Странно, я не нашел тебя в своей базе данных");
             return;

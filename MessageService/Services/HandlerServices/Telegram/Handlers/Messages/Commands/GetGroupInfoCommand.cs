@@ -30,7 +30,7 @@ public class GetGroupInfoCommand : BotCommandAction {
 
         if (int.TryParse(msg, out int idGroup)) {
             var context = _dbService.GetDBContext();
-            var findedGroup = await context.Groups!.FirstOrDefaultAsync(e => e.GroupId == idGroup && e.Users!.Any(s => s.Name!.Equals(message.From!.Username)));
+            var findedGroup = await context.Groups!.FirstOrDefaultAsync(e => e.GroupId == idGroup && e.Users!.Any(s => s.Id!.Equals(message.From!.Id.ToString())));
 
             if (findedGroup != null) {
                 await botClient.SendTextMessageAsync(chatId, $"Вот что я знаю о группе {findedGroup.Title} ({findedGroup.GroupId})");

@@ -61,7 +61,7 @@ public class AddChatToGroupCommand : BotCommandAction {
         }
 
         // проверка пользователя на наличие в группе
-        var user = await context.Users.FirstOrDefaultAsync(e => e.Name == message.From!.Username);
+        var user = await context.Users.FirstOrDefaultAsync(e => e.Id == message.From!.Id.ToString());
         if (user == null) {
             await botClient.SendTextMessageAsync(privateChatId, $"Странно, я не нашел твою учетку в своей базе данных");
             return;
@@ -75,7 +75,7 @@ public class AddChatToGroupCommand : BotCommandAction {
         // проверка наличия чата в группе
         var chatToGroup = await context.ChatGroups.FirstOrDefaultAsync(e => e.ChatId!.Equals(chat.ChatId) && e.GroupId == group.GroupId);
         if (chatToGroup != null) {
-            // если имеется 
+            // если имеется
             if (chatToGroup.IsDeleted) {
                 chatToGroup.IsDeleted = false;
                 context.Entry(chatToGroup).State = EntityState.Modified;
