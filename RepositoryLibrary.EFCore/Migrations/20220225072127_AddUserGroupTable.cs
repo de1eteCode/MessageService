@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace MessageService.Datas.Migrations {
+namespace RepositoryLibrary.EFCore.Migrations {
 
     public partial class AddUserGroupTable : Migration {
 

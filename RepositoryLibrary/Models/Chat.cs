@@ -1,4 +1,4 @@
-﻿namespace MessageService.Datas.Models;
+﻿namespace RepositoryLibrary.Models;
 
 public class Chat {
     public string? ChatId { get; set; }

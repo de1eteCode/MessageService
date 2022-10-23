@@ -1,7 +1,7 @@
-﻿using MessageService.Datas;
-using MessageService.Services.HandlerServices.Telegram.Attributes;
+﻿using MessageService.Services.HandlerServices.Telegram.Attributes;
 using MessageService.Services.HelperService;
 using Microsoft.EntityFrameworkCore;
+using RepositoryLibrary.EFCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -63,7 +63,7 @@ public class AddUserCommand : BotCommandAction {
                 return;
             }
 
-            var newUser = new Datas.Models.User() {
+            var newUser = new RepositoryLibrary.Models.User() {
                 Id = idTelegram.ToString(),
                 Name = String.Join(" ", splitedText.Skip((int)PositionArgs.Name)),
                 Role = selectedRoleUser,

@@ -128,7 +128,7 @@ public class TelegramService : ITelegramService, IWhoIam, ITelegramSenderMessage
         return _meUser;
     }
 
-    public async Task SendMessageAsync(string message, Datas.Models.Chat chat, int @try = 1) {
+    public async Task SendMessageAsync(string message, RepositoryLibrary.Models.Chat chat, int @try = 1) {
         if (string.IsNullOrEmpty(message)) {
             return;
         }

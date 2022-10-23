@@ -1,4 +1,4 @@
-﻿using MessageService.Datas.Models;
+﻿using RepositoryLibrary.Models;
 
 namespace MessageService.Services.HandlerServices;
 

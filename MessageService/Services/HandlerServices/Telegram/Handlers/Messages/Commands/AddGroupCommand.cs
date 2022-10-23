@@ -1,8 +1,8 @@
-﻿using MessageService.Datas;
-using MessageService.Datas.Models;
-using MessageService.Services.HandlerServices.Telegram.Attributes;
+﻿using MessageService.Services.HandlerServices.Telegram.Attributes;
 using MessageService.Services.HelperService;
 using Microsoft.EntityFrameworkCore;
+using RepositoryLibrary.EFCore;
+using RepositoryLibrary.Models;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -38,7 +38,7 @@ public class AddGroupCommand : BotCommandAction {
 
         var newGroup = new Group() {
             Title = msg,
-            Users = new List<Datas.Models.User>() {
+            Users = new List<RepositoryLibrary.Models.User>() {
                 addedGroupUser
             }
         };

@@ -1,4 +1,4 @@
-﻿namespace MessageService.Datas.Models;
+﻿namespace RepositoryLibrary.Models;
 
 public class ChatGroup {
     public int Id { get; set; }

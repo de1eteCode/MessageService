@@ -1,6 +1,6 @@
-﻿using MessageService.Datas;
-using MessageService.Services.HelperService;
+﻿using MessageService.Services.HelperService;
 using Microsoft.EntityFrameworkCore;
+using RepositoryLibrary.EFCore;
 using Telegram.Bot.Types;
 
 namespace MessageService.Services.HandlerServices.Telegram.Handlers.MyChatMembers;
@@ -33,7 +33,7 @@ public class ForgetChat {
         }
         else {
             // бот не знал о чате, на всякий случай запомним чат
-            chat = new Datas.Models.Chat() {
+            chat = new RepositoryLibrary.Models.Chat() {
                 ChatId = chatMemberUpdate.Chat.Id.ToString(),
                 Name = chatMemberUpdate.Chat.Title,
                 IsJoined = false,

@@ -1,8 +1,8 @@
 ﻿using System.Text;
-using MessageService.Datas;
 using MessageService.Services.HandlerServices.Telegram.Attributes;
 using MessageService.Services.HelperService;
 using Microsoft.EntityFrameworkCore;
+using RepositoryLibrary.EFCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 

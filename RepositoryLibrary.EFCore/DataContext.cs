@@ -1,10 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MessageService.Datas.Models;
+using RepositoryLibrary.Models;
 
-namespace MessageService.Datas;
-
+namespace RepositoryLibrary.EFCore;
 public class DataContext : DbContext {
-
     public DataContext(DbContextOptions options) : base(options) {
     }
 

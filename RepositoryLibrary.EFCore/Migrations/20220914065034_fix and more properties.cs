@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MessageService.Datas.Migrations
+namespace RepositoryLibrary.EFCore.Migrations
 {
     public partial class fixandmoreproperties : Migration
     {

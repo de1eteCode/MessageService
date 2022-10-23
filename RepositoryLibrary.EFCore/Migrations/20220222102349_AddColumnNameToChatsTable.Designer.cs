@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MessageService.Datas.Migrations
+namespace RepositoryLibrary.EFCore.Migrations
 {
     [DbContext(typeof(DataContext))]
     [Migration("20220222102349_AddColumnNameToChatsTable")]

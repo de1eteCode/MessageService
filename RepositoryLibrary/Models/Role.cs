@@ -1,4 +1,4 @@
-﻿namespace MessageService.Datas.Models;
+﻿namespace RepositoryLibrary.Models;
 
 public class Role {
     public int RoleId { get; set; }

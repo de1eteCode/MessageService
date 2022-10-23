@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using MessageService.Datas;
 using MessageService.Models;
 using MessageService.Services.HandlerServices.Telegram.Attributes;
 using MessageService.Services.HelperService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using RepositoryLibrary.EFCore;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
@@ -30,7 +30,7 @@ public class GetChatsInfoCommand : BotCommandAction {
         stopwatch.Start();
         var context = _dbService.GetDBContext();
 
-        IQueryable<Datas.Models.Chat> allChats = context.Chats;
+        IQueryable<RepositoryLibrary.Models.Chat> allChats = context.Chats;
 
         var msg = message.Text!;
         if (string.IsNullOrEmpty(msg)) {
@@ -65,7 +65,7 @@ public class GetChatsInfoCommand : BotCommandAction {
         await botClient.SendTextMessageAsync(message.Chat.Id, stopwatch.Elapsed.ToString());
     }
 
-    private Task<string> BuildBlockInfoChat(Datas.Models.Chat chatModel, ITelegramBotClient botClient) {
+    private Task<string> BuildBlockInfoChat(RepositoryLibrary.Models.Chat chatModel, ITelegramBotClient botClient) {
         var strBuilder = new StringBuilder();
         strBuilder.AppendLine("ID: " + chatModel.ChatId);
         strBuilder.AppendLine("Имя: " + chatModel.Name);
