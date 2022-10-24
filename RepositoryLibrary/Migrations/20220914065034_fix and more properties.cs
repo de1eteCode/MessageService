@@ -4,12 +4,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace RepositoryLibrary.EFCore.Migrations
-{
-    public partial class fixandmoreproperties : Migration
-    {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+namespace RepositoryLibrary.Migrations {
+
+    public partial class fixandmoreproperties : Migration {
+
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropForeignKey(
                 name: "FK_ChatGroups_Chats_ChatId",
                 table: "ChatGroups");
@@ -132,8 +131,7 @@ namespace RepositoryLibrary.EFCore.Migrations
                 onDelete: ReferentialAction.Cascade);
         }
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropForeignKey(
                 name: "FK_ChatGroups_Chats_ChatId",
                 table: "ChatGroups");

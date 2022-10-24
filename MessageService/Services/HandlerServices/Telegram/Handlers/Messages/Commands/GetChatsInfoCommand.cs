@@ -2,10 +2,10 @@
 using System.Text;
 using MessageService.Models;
 using MessageService.Services.HandlerServices.Telegram.Attributes;
-using MessageService.Services.HelperService;
+using RepositoryLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using RepositoryLibrary.EFCore;
+using RepositoryLibrary;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
@@ -26,8 +26,6 @@ public class GetChatsInfoCommand : BotCommandAction {
     }
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
         var context = _dbService.GetDBContext();
 
         IQueryable<RepositoryLibrary.Models.Chat> allChats = context.Chats;
@@ -60,9 +58,7 @@ public class GetChatsInfoCommand : BotCommandAction {
                 stringBuilder.AppendLine(task.Result);
             }
         }
-        stopwatch.Stop();
         await botClient.SendTextMessageAndSplitIfOverfullAsync(message.Chat.Id, stringBuilder.ToString());
-        await botClient.SendTextMessageAsync(message.Chat.Id, stopwatch.Elapsed.ToString());
     }
 
     private Task<string> BuildBlockInfoChat(RepositoryLibrary.Models.Chat chatModel, ITelegramBotClient botClient) {

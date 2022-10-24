@@ -1,7 +1,8 @@
-﻿using MessageService.Services.HandlerServices.Telegram.Attributes;
-using MessageService.Services.HelperService;
+﻿using System.Text;
+using MessageService.Services.HandlerServices.Telegram.Attributes;
+using RepositoryLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
-using RepositoryLibrary.EFCore;
+using RepositoryLibrary;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -35,9 +36,11 @@ public class GetGroupsInfoCommand : BotCommandAction {
             return;
         }
 
-        await botClient.SendTextMessageAsync(message.Chat.Id, $"Вот что я знаю о группах, в которых ты состоишь, их всего {count}. {(count > 5 ? "Готовтесь к спаму с:" : "")}");
+        await botClient.SendTextMessageAsync(message.Chat.Id, $"Вот что я знаю о группах, в которых ты состоишь, их всего {count}.");
+        var sb = new StringBuilder();
         await groups.ForEachAsync(group => {
-            botClient.SendTextMessageAsync(message.Chat.Id, String.Format("{0} - {1}", group.GroupId, group.Title));
+            sb.AppendLine(String.Format("{0} - {1}", group.GroupId, group.Title));
         });
+        await botClient.SendTextMessageAndSplitIfOverfullAsync(message.Chat.Id, sb.ToString());
     }
 }

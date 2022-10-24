@@ -7,11 +7,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace RepositoryLibrary.EFCore.Migrations
+namespace RepositoryLibrary.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220225072127_AddUserGroupTable")]
-    partial class AddUserGroupTable
+    [Migration("20220222061146_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -25,9 +25,6 @@ namespace RepositoryLibrary.EFCore.Migrations
             modelBuilder.Entity("Информатор.Chat", b =>
                 {
                     b.Property<string>("ChatId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
                         .HasColumnType("text");
 
                     b.HasKey("ChatId");
@@ -111,21 +108,6 @@ namespace RepositoryLibrary.EFCore.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("GroupUser", b =>
-                {
-                    b.Property<int>("GroupsGroupId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("UsersId")
-                        .HasColumnType("text");
-
-                    b.HasKey("GroupsGroupId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("GroupUser");
-                });
-
             modelBuilder.Entity("Информатор.ChatGroup", b =>
                 {
                     b.HasOne("Информатор.Chat", "Chat")
@@ -152,21 +134,6 @@ namespace RepositoryLibrary.EFCore.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("GroupUser", b =>
-                {
-                    b.HasOne("Информатор.Group", null)
-                        .WithMany()
-                        .HasForeignKey("GroupsGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Информатор.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

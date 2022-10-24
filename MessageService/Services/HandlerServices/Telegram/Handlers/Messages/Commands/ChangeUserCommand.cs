@@ -1,6 +1,6 @@
-﻿using MessageService.Services.HelperService;
+﻿using RepositoryLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
-using RepositoryLibrary.EFCore;
+using RepositoryLibrary;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -72,7 +72,7 @@ public class ChangeUserCommand : BotCommandAction {
 
         Task SendDefaultMessage() {
             return botClient.SendTextMessageAsync(privateChatId,
-                "Синтаксис изменения пользователя: /changeuser [tg username] [id роли]\n" +
+                "Синтаксис изменения пользователя: /changeuser [tg user id] [id роли]\n" +
                 "Доступные роли:\n" +
                 String.Join("\n", roles.Select(e => String.Join(" - ", e.RoleId, e.RoleName))));
         }

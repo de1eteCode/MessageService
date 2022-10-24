@@ -2,12 +2,11 @@
 
 #nullable disable
 
-namespace RepositoryLibrary.EFCore.Migrations
-{
-    public partial class removedefaultvalueforIsJoined : Migration
-    {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+namespace RepositoryLibrary.Migrations {
+
+    public partial class removedefaultvalueforIsJoined : Migration {
+
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.AlterColumn<bool>(
                 name: "IsJoined",
                 table: "Chats",
@@ -18,8 +17,7 @@ namespace RepositoryLibrary.EFCore.Migrations
                 oldDefaultValue: true);
         }
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.AlterColumn<bool>(
                 name: "IsJoined",
                 table: "Chats",

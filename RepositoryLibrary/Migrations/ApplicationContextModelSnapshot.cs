@@ -2,19 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace RepositoryLibrary.EFCore.Migrations
+namespace RepositoryLibrary.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220914065034_fix and more properties")]
-    partial class fixandmoreproperties
+    partial class ApplicationContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,9 +42,7 @@ namespace RepositoryLibrary.EFCore.Migrations
                         .HasColumnType("text");
 
                     b.Property<bool>("IsJoined")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true);
+                        .HasColumnType("boolean");
 
                     b.Property<string>("KickedByUserLogin")
                         .HasColumnType("text");

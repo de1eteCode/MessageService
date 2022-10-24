@@ -1,8 +1,8 @@
 using MessageService.Models;
 using MessageService.Services.HandlerServices;
-using MessageService.Services.HelperService;
+using RepositoryLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
-using RepositoryLibrary.EFCore;
+using RepositoryLibrary;
 
 namespace MessageService;
 

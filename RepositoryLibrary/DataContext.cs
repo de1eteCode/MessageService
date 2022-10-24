@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RepositoryLibrary.Models;
 
-namespace RepositoryLibrary.EFCore;
+namespace RepositoryLibrary;
+
 public class DataContext : DbContext {
+
     public DataContext(DbContextOptions options) : base(options) {
     }
 

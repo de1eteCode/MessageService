@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace MessageService.Services.HelperService;
+namespace RepositoryLibrary.Helpers;
 
 public interface IDatabaseService<T> where T : DbContext {
 
