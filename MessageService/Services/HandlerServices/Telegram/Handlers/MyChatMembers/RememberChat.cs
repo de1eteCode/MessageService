@@ -1,6 +1,6 @@
-﻿using RepositoryLibrary.Helpers;
+﻿using DataLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
-using RepositoryLibrary;
+using DataLibrary;
 using Telegram.Bot.Types;
 
 namespace MessageService.Services.HandlerServices.Telegram.Handlers.MyChatMembers;
@@ -21,21 +21,21 @@ public class RememberChat {
         var context = _dbService.GetDBContext();
 
         // проверка на ранее добавления бота в чат
-        var chat = await context.Chats.FirstOrDefaultAsync(e => e.ChatId!.Equals(chatMemberUpdate.Chat.Id.ToString()));
+        var chat = await context.Chats.FirstOrDefaultAsync(e => e.TelegramChatId!.Equals(chatMemberUpdate.Chat.Id.ToString()));
 
         if (chat != null) {
             // бот ранее состоял в этом чате
             chat.IsJoined = true;
-            chat.Name = chatMemberUpdate.Chat.Title;
+            chat.Name = chatMemberUpdate.Chat.Title!;
             chat.KickedTime = null;
             chat.KickedByUserLogin = null;
             context.Entry(chat).State = EntityState.Modified;
         }
         else {
             // бот в первые в этом чате
-            chat = new RepositoryLibrary.Models.Chat() {
-                ChatId = chatMemberUpdate.Chat.Id.ToString(),
-                Name = chatMemberUpdate.Chat.Title
+            chat = new DataLibrary.Models.Chat() {
+                TelegramChatId = chatMemberUpdate.Chat.Id,
+                Name = chatMemberUpdate.Chat.Title!
             };
 
             context.Entry(chat).State = EntityState.Added;

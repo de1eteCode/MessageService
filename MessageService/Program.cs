@@ -1,8 +1,8 @@
 using MessageService.Models;
 using MessageService.Services.HandlerServices;
-using RepositoryLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
-using RepositoryLibrary;
+using DataLibrary;
+using DataLibrary.Helpers;
 
 namespace MessageService;
 
@@ -14,10 +14,7 @@ public class Program {
         builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelegramSettings"));
 
         // Add services to the container.
-        builder.Services.AddDataRepository(options => {
-            options.UseLazyLoadingProxies();
-            options.UseNpgsql(builder.Configuration.GetConnectionString("psql"));
-        });
+        builder.Services.AddDataRepository(builder.Configuration.GetConnectionString("psql"));
 
         builder.Services.AddRazorPages();
         builder.Services.AddServerSideBlazor();

@@ -2,10 +2,10 @@
 using System.Text;
 using MessageService.Models;
 using MessageService.Services.HandlerServices.Telegram.Attributes;
-using RepositoryLibrary.Helpers;
+using DataLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using RepositoryLibrary;
+using DataLibrary;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
@@ -28,7 +28,7 @@ public class GetChatsInfoCommand : BotCommandAction {
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
         var context = _dbService.GetDBContext();
 
-        IQueryable<RepositoryLibrary.Models.Chat> allChats = context.Chats;
+        IQueryable<DataLibrary.Models.Chat> allChats = context.Chats;
 
         var msg = message.Text!;
         if (string.IsNullOrEmpty(msg)) {
@@ -61,13 +61,13 @@ public class GetChatsInfoCommand : BotCommandAction {
         await botClient.SendTextMessageAndSplitIfOverfullAsync(message.Chat.Id, stringBuilder.ToString());
     }
 
-    private Task<string> BuildBlockInfoChat(RepositoryLibrary.Models.Chat chatModel, ITelegramBotClient botClient) {
+    private Task<string> BuildBlockInfoChat(DataLibrary.Models.Chat chatModel, ITelegramBotClient botClient) {
         var strBuilder = new StringBuilder();
-        strBuilder.AppendLine("ID: " + chatModel.ChatId);
+        strBuilder.AppendLine("ID: " + chatModel.TelegramChatId);
         strBuilder.AppendLine("Имя: " + chatModel.Name);
         if (chatModel.IsJoined) {
             try {
-                var chatInfo = botClient.GetChatAsync(chatModel.ChatId!).Result;
+                var chatInfo = botClient.GetChatAsync(chatModel.TelegramChatId!).Result;
                 strBuilder.AppendLine("Статус: состою в чате");
             }
             catch (AggregateException ex) when (ex.InnerException!.GetType() == typeof(ApiRequestException) && ((ApiRequestException)ex.InnerException).ErrorCode == 400) { // Not found exception

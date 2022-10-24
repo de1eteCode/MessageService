@@ -1,8 +1,8 @@
 ﻿using MessageService.Services.HandlerServices.Telegram.Attributes;
 using Microsoft.EntityFrameworkCore;
-using RepositoryLibrary;
-using RepositoryLibrary.Helpers;
-using RepositoryLibrary.Models;
+using DataLibrary;
+using DataLibrary.Helpers;
+using DataLibrary.Models;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -29,7 +29,7 @@ public class AddGroupCommand : BotCommandAction {
         }
 
         var context = _dbService.GetDBContext();
-        var addedGroupUser = await context.Users.FirstOrDefaultAsync(e => e.Id!.Equals(message.From!.Id.ToString()));
+        var addedGroupUser = await context.Users.FirstOrDefaultAsync(e => e.TelegramId!.Equals(message.From!.Id.ToString()));
 
         if (addedGroupUser == null) {
             await botClient.SendTextMessageAsync(chatId, "Странно, я не нашел твоей учетной записи у себя в базе");
@@ -37,8 +37,8 @@ public class AddGroupCommand : BotCommandAction {
         }
 
         var newGroup = new Group() {
-            Title = msg,
-            Users = new List<RepositoryLibrary.Models.User>() {
+            Name = msg,
+            UserGroups = new List<UserGroup>() {
                 addedGroupUser
             }
         };

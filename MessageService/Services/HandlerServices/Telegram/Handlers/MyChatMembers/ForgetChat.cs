@@ -1,6 +1,6 @@
-﻿using RepositoryLibrary.Helpers;
+﻿using DataLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
-using RepositoryLibrary;
+using DataLibrary;
 using Telegram.Bot.Types;
 
 namespace MessageService.Services.HandlerServices.Telegram.Handlers.MyChatMembers;
@@ -22,7 +22,7 @@ public class ForgetChat {
         var context = _dbService.GetDBContext();
 
         // проверка на чат
-        var chat = await context.Chats.FirstOrDefaultAsync(e => e.ChatId!.Equals(chatMemberUpdate.Chat.Id.ToString()));
+        var chat = await context.Chats.FirstOrDefaultAsync(e => e.TelegramChatId!.Equals(chatMemberUpdate.Chat.Id.ToString()));
 
         if (chat != null) {
             // бот знает о чате и надо пометить что его кикнули
@@ -33,9 +33,9 @@ public class ForgetChat {
         }
         else {
             // бот не знал о чате, на всякий случай запомним чат
-            chat = new RepositoryLibrary.Models.Chat() {
-                ChatId = chatMemberUpdate.Chat.Id.ToString(),
-                Name = chatMemberUpdate.Chat.Title,
+            chat = new DataLibrary.Models.Chat() {
+                TelegramChatId = chatMemberUpdate.Chat.Id,
+                Name = chatMemberUpdate.Chat!.Title!,
                 IsJoined = false,
                 KickedByUserLogin = chatMemberUpdate.From?.Username ?? "unknown user",
                 KickedTime = chatMemberUpdate.Date

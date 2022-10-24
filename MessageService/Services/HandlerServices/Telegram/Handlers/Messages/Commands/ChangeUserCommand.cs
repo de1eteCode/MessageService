@@ -1,6 +1,6 @@
-﻿using RepositoryLibrary.Helpers;
+﻿using DataLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
-using RepositoryLibrary;
+using DataLibrary;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -38,7 +38,7 @@ public class ChangeUserCommand : BotCommandAction {
         var idTelegramStr = splitedText.First();
 
         // проверка на наличие такого пользователя
-        var userForChange = await context.Users.FirstOrDefaultAsync(e => e.Id!.Equals(idTelegramStr));
+        var userForChange = await context.Users.FirstOrDefaultAsync(e => e.TelegramId!.Equals(idTelegramStr));
 
         if (userForChange == null) {
             await botClient.SendTextMessageAsync(privateChatId, $"Пользователь {idTelegramStr} не найден");
@@ -56,7 +56,7 @@ public class ChangeUserCommand : BotCommandAction {
             }
 
             userForChange.Role = selectedRoleUser;
-            userForChange.RoleId = roleIdNum;
+            userForChange.RoleUID = selectedRoleUser.UID;
 
             context.Entry(userForChange).State = EntityState.Modified;
 

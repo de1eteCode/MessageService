@@ -1,8 +1,8 @@
 ﻿using System.Text;
 using MessageService.Services.HandlerServices.Telegram.Attributes;
-using RepositoryLibrary.Helpers;
+using DataLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
-using RepositoryLibrary;
+using DataLibrary;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -22,13 +22,13 @@ public class GetGroupsInfoCommand : BotCommandAction {
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
         var context = _dbService.GetDBContext();
 
-        var user = await context.Users.FirstOrDefaultAsync(e => e.Id == message.From!.Id.ToString());
+        var user = await context.Users.FirstOrDefaultAsync(e => e.TelegramId == message.From!.Id);
         if (user == null) {
             await botClient.SendTextMessageAsync(message.Chat.Id, "Странно, я не нашел тебя в своей базе данных");
             return;
         }
 
-        var groups = context.Groups.Where(e => e.Users!.Any(s => s.Id == user.Id));
+        var groups = context.Groups.Where(e => e.UserGroups!.Any(s => s.UserUID == user.UID));
         var count = await groups.CountAsync();
 
         if (count < 1) {
@@ -39,7 +39,7 @@ public class GetGroupsInfoCommand : BotCommandAction {
         await botClient.SendTextMessageAsync(message.Chat.Id, $"Вот что я знаю о группах, в которых ты состоишь, их всего {count}.");
         var sb = new StringBuilder();
         await groups.ForEachAsync(group => {
-            sb.AppendLine(String.Format("{0} - {1}", group.GroupId, group.Title));
+            sb.AppendLine(String.Format("{0} - {1}", group.AlternativeId, group.Name));
         });
         await botClient.SendTextMessageAndSplitIfOverfullAsync(message.Chat.Id, sb.ToString());
     }

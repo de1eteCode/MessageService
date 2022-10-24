@@ -1,7 +1,7 @@
 ﻿using MessageService.Services.HandlerServices.Telegram.Attributes;
-using RepositoryLibrary.Helpers;
+using DataLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
-using RepositoryLibrary;
+using DataLibrary;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -41,7 +41,7 @@ public class SendAllChatByGroupCommand : BotCommandAction {
 
         if (int.TryParse(groupIdToSend, out var groupId)) {
             // проверка выбранной группы
-            var selectedGroup = availableGroups.FirstOrDefault(e => e.GroupId == groupId);
+            var selectedGroup = availableGroups.FirstOrDefault(e => e.AlternativeId == groupId);
 
             if (selectedGroup == null) {
                 await botClient.SendTextMessageAsync(chatId, $"Я не нашел у себя в базе группу с идентификатором {groupId}");
@@ -57,7 +57,7 @@ public class SendAllChatByGroupCommand : BotCommandAction {
             }
 
             // рассылка сообщений
-            var chatIds = context.ChatGroups.Where(e => e.GroupId == groupId && e.IsDeleted == false).Select(e => e.ChatId!);
+            var chatIds = context.ChatGroups.Where(e => e.Group.AlternativeId == groupId && e.IsDeleted == false).Select(e => e.Chat.TelegramChatId!);
 
             var chatSended = 0;
 
@@ -71,7 +71,7 @@ public class SendAllChatByGroupCommand : BotCommandAction {
                 await botClient.SendTextMessageAsync(chatId, $"Сообщение отправлено в {chatSended} чатов");
             }
             else {
-                await botClient.SendTextMessageAsync(chatId, $"В группе {selectedGroup.Title} нет чатов");
+                await botClient.SendTextMessageAsync(chatId, $"В группе {selectedGroup.Name} нет чатов");
             }
         }
         else {

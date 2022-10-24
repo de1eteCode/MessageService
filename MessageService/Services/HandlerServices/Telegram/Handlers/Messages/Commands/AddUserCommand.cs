@@ -1,7 +1,7 @@
 ﻿using MessageService.Services.HandlerServices.Telegram.Attributes;
-using RepositoryLibrary.Helpers;
+using DataLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
-using RepositoryLibrary;
+using DataLibrary;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -39,14 +39,14 @@ public class AddUserCommand : BotCommandAction {
         }
 
         var idTelegramStr = splitedText[(int)PositionArgs.TelegramId];
-        ulong idTelegram;
-        if (ulong.TryParse(idTelegramStr, out idTelegram) == false) {
+        long idTelegram;
+        if (long.TryParse(idTelegramStr, out idTelegram) == false) {
             await botClient.SendTextMessageAsync(chatId, $"{idTelegramStr} не похож на идентификатор пользователя Telegram");
             return;
         }
 
         // проверка на наличие такого пользователя
-        var addedUser = await context.Users.FirstOrDefaultAsync(e => e.Id!.Equals(idTelegram));
+        var addedUser = await context.Users.FirstOrDefaultAsync(e => e.TelegramId!.Equals(idTelegram));
 
         if (addedUser != null) {
             await botClient.SendTextMessageAsync(chatId, $"Пользователь {addedUser.Name} был ранее добавлен");
@@ -63,8 +63,8 @@ public class AddUserCommand : BotCommandAction {
                 return;
             }
 
-            var newUser = new RepositoryLibrary.Models.User() {
-                Id = idTelegram.ToString(),
+            var newUser = new DataLibrary.Models.User() {
+                TelegramId = idTelegram,
                 Name = String.Join(" ", splitedText.Skip((int)PositionArgs.Name)),
                 Role = selectedRoleUser,
                 RoleId = selectedRoleUser.RoleId

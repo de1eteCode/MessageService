@@ -1,8 +1,8 @@
 ﻿using MessageService.Services.HandlerServices.Telegram.Attributes;
 using MessageService.Services.HandlerServices.Telegram.Handlers.Messages;
-using RepositoryLibrary.Helpers;
+using DataLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
-using RepositoryLibrary;
+using DataLibrary;
 using Telegram.Bot.Types;
 
 namespace MessageService.Services.HandlerServices.Telegram.AttributeValidators;
@@ -28,17 +28,17 @@ public class TelegramUserRoleValidator : BaseValidator<TelegramUserRoleAttribute
 
         var context = _dbService.GetDBContext();
 
-        var userModel = await context.Users.FirstOrDefaultAsync(e => e.Id!.Equals(user.Id.ToString()));
+        var userModel = await context.Users.FirstOrDefaultAsync(e => e.TelegramId!.Equals(user.Id));
 
         if (userModel == null) {
             // нет пользователя, значит нет ролей, значит доступ запрещен
             return TelegramValidatorResult.Deny;
         }
 
-        var role = await context.Roles.FirstAsync(e => e.RoleId == userModel.RoleId);
+        var role = await context.Roles.FirstAsync(e => e.UID == userModel.RoleUID);
 
         foreach (var attr in attributes) {
-            if (attr.RoleName.Equals(role.RoleName)) {
+            if (attr.RoleName.Equals(role.Name)) {
                 return TelegramValidatorResult.Allow;
             }
         }

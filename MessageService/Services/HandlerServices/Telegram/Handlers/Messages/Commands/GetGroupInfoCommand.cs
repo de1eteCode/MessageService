@@ -1,8 +1,8 @@
 ﻿using System.Text;
 using MessageService.Services.HandlerServices.Telegram.Attributes;
-using RepositoryLibrary.Helpers;
+using DataLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
-using RepositoryLibrary;
+using DataLibrary;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -30,19 +30,19 @@ public class GetGroupInfoCommand : BotCommandAction {
 
         if (int.TryParse(msg, out int idGroup)) {
             var context = _dbService.GetDBContext();
-            var findedGroup = await context.Groups!.FirstOrDefaultAsync(e => e.GroupId == idGroup && e.Users!.Any(s => s.Id!.Equals(message.From!.Id.ToString())));
+            var findedGroup = await context.Groups!.FirstOrDefaultAsync(e => e.AlternativeId == idGroup && e.UserGroups!.Any(s => s.User!.TelegramId.Equals(message.From!.Id)));
 
             if (findedGroup != null) {
-                await botClient.SendTextMessageAsync(chatId, $"Вот что я знаю о группе {findedGroup.Title} ({findedGroup.GroupId})");
+                await botClient.SendTextMessageAsync(chatId, $"Вот что я знаю о группе {findedGroup.Name} ({findedGroup.AlternativeId})");
 
-                var nameUsersGroup = findedGroup.Users!.Select(e => e.Name).ToList();
+                var nameUsersGroup = findedGroup.UserGroups!.Select(e => e.User.Name).ToList();
                 var sb = new StringBuilder();
                 sb.AppendLine($"Пользователи чата (количество {nameUsersGroup.Count}):");
                 nameUsersGroup.ForEach(name => sb.AppendLine("- " + name));
                 await botClient.SendTextMessageAsync(chatId, sb.ToString());
                 sb.Clear();
 
-                var nameChatsGroup = await context.ChatGroups.Where(e => e.GroupId == findedGroup.GroupId && e.IsDeleted == false).Select(e => e.Chat!.Name).ToListAsync();
+                var nameChatsGroup = await context.ChatGroups.Where(e => e.GroupUID == findedGroup.UID && e.IsDeleted == false).Select(e => e.Chat!.Name).ToListAsync();
                 sb.AppendLine($"Включенные чаты в группу (количество {nameChatsGroup.Count}):");
                 nameChatsGroup.ForEach(name => sb.AppendLine("- " + name));
                 await botClient.SendTextMessageAsync(chatId, sb.ToString());

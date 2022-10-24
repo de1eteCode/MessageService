@@ -1,7 +1,7 @@
 ﻿using MessageService.Services.HandlerServices.Telegram.Attributes;
-using RepositoryLibrary.Helpers;
+using DataLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
-using RepositoryLibrary;
+using DataLibrary;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -28,48 +28,53 @@ public class RemoveChatFromGroupCommand : BotCommandAction {
         }
 
         var splited = msg.Split(" ", 2);
-        var chatIdToRemove = splited.First();
+        var chatIdStrToRemove = splited.First();
         var groupIdStrToRemove = splited.Last();
-        int groupIdToRemove = -1;
 
         // парсинг идентификатора группы
-        if (int.TryParse(groupIdStrToRemove, out groupIdToRemove) == false) {
+        if (int.TryParse(groupIdStrToRemove, out int groupIdToRemove) == false) {
             await botClient.SendTextMessageAsync(privateChatId, $"Хм, я думаю {groupIdStrToRemove} не похож на идентификатор группы");
+            return;
+        }
+
+        // парсинг идентификатора чата
+        if (long.TryParse(chatIdStrToRemove, out long chatIdToRemove) == false) {
+            await botClient.SendTextMessageAsync(privateChatId, $"Хм, я думаю {groupIdStrToRemove} не похож на идентификатор чата");
             return;
         }
 
         var context = _dbService.GetDBContext();
 
         // поиск чата по идентификатору
-        var chat = await context.Chats.FirstOrDefaultAsync(e => e.ChatId == chatIdToRemove);
+        var chat = await context.Chats.FirstOrDefaultAsync(e => e.TelegramChatId == chatIdToRemove);
         if (chat == null) {
             await botClient.SendTextMessageAsync(privateChatId, $"Я не знаю о чате с идентификатором {chatIdToRemove}");
             return;
         }
 
         // поиск группы по идентификатору
-        var group = await context.Groups.FirstOrDefaultAsync(e => e.GroupId == groupIdToRemove);
+        var group = await context.Groups.FirstOrDefaultAsync(e => e.AlternativeId == groupIdToRemove);
         if (group == null) {
             await botClient.SendTextMessageAsync(privateChatId, $"У меня нет группы с идентификатором {groupIdToRemove}");
             return;
         }
 
         // проверка пользователя на наличие в группе
-        var user = await context.Users.FirstOrDefaultAsync(e => e.Id == message.From!.Id.ToString());
+        var user = await context.Users.FirstOrDefaultAsync(e => e.TelegramId == message.From!.Id);
         if (user == null) {
             await botClient.SendTextMessageAsync(privateChatId, $"Странно, я не нашел твою учетку в своей базе данных");
             return;
         }
 
-        if (group.Users!.Any(e => e.Id == user.Id) == false) {
+        if (group.UserGroups!.Any(e => e.UserUID == user.UID) == false) {
             await botClient.SendTextMessageAsync(privateChatId, $"Ты не можешь удалять чаты из группы, в которой не состоишь");
             return;
         }
 
         // проверка наличия чата в группе
-        var chatToGroup = await context.ChatGroups.FirstOrDefaultAsync(e => e.ChatId!.Equals(chat.ChatId) && e.GroupId == group.GroupId && e.IsDeleted == false);
+        var chatToGroup = await context.ChatGroups.FirstOrDefaultAsync(e => e.Chat.TelegramChatId!.Equals(chat.TelegramChatId) && e.GroupUID == group.UID && e.IsDeleted == false);
         if (chatToGroup == null) {
-            await botClient.SendTextMessageAsync(privateChatId, $"Чат \"{chat.Name}\" не состоит в группе \"{group.Title}\"");
+            await botClient.SendTextMessageAsync(privateChatId, $"Чат \"{chat.Name}\" не состоит в группе \"{group.Name}\"");
             return;
         }
 
@@ -78,7 +83,7 @@ public class RemoveChatFromGroupCommand : BotCommandAction {
         context.Entry(chatToGroup).State = EntityState.Modified;
         await context.SaveChangesAsync();
 
-        await botClient.SendTextMessageAsync(privateChatId, $"Чат \"{chat.Name}\" успешно удален из группы \"{group.Title}\"");
+        await botClient.SendTextMessageAsync(privateChatId, $"Чат \"{chat.Name}\" успешно удален из группы \"{group.Name}\"");
 
         return;
 

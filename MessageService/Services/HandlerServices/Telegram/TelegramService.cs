@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using MessageService.Models;
+﻿using MessageService.Models;
 using MessageService.Services.HandlerServices.Telegram.Handlers.Messages;
 using Microsoft.Extensions.Options;
 using RPSLimitTelegramBotLibrary.Telegram;
@@ -128,13 +127,13 @@ public class TelegramService : ITelegramService, IWhoIam, ITelegramSenderMessage
         return _meUser;
     }
 
-    public async Task SendMessageAsync(string message, RepositoryLibrary.Models.Chat chat, int @try = 1) {
+    public async Task SendMessageAsync(string message, DataLibrary.Models.Chat chat, int @try = 1) {
         if (string.IsNullOrEmpty(message)) {
             return;
         }
 
         for (; @try < 3; @try++) {
-            var resMsg = await _telegramClient.SendTextMessageAsync(new ChatId(chat.ChatId ?? throw new ArgumentNullException(nameof(chat))), message);
+            var resMsg = await _telegramClient.SendTextMessageAsync(new ChatId(chat.TelegramChatId), message);
             if (resMsg != null) {
                 break;
             }

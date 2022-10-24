@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace RepositoryLibrary.Helpers;
+namespace DataLibrary.Helpers;
 
 public interface IDatabaseService<T> where T : DbContext {
 

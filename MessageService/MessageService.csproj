@@ -19,8 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RepositoryLibrary\RepositoryLibrary.csproj" />
+    <ProjectReference Include="..\DataLibrary\DataLibrary.csproj" />
     <ProjectReference Include="..\RPSLimitTelegramBotLibrary\RPSLimitTelegramBotLibrary.csproj" />
   </ItemGroup>
+
+  <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>

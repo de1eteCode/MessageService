@@ -1,7 +1,7 @@
 ﻿using MessageService.Services.HandlerServices.Telegram.Attributes;
-using RepositoryLibrary.Helpers;
+using DataLibrary.Helpers;
 using Microsoft.EntityFrameworkCore;
-using RepositoryLibrary;
+using DataLibrary;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -28,7 +28,7 @@ public class SendAllChatMessageCommand : BotCommandAction {
         }
 
         var context = _dbService.GetDBContext();
-        var chats = context.Chats.Where(e => e.IsJoined).Select(e => e.ChatId);
+        var chats = context.Chats.Where(e => e.IsJoined).Select(e => e.TelegramChatId);
 
         var chatSended = 0;
 
