@@ -1,6 +1,6 @@
 ﻿namespace RepositoryLibrary.Models;
 
-public class Chat {
+public class Chat : BaseModelEntity {
     public string? ChatId { get; set; }
     public string? Name { get; set; }
     public bool IsJoined { get; set; }

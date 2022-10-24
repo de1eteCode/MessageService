@@ -1,6 +1,6 @@
 ﻿namespace RepositoryLibrary.Models;
 
-public class User {
+public class User : BaseModelEntity {
     public string? Id { get; set; }
     public string? Name { get; set; }
     public int RoleId { get; set; }

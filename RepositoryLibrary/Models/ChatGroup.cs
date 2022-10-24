@@ -1,6 +1,6 @@
 ﻿namespace RepositoryLibrary.Models;
 
-public class ChatGroup {
+public class ChatGroup : BaseModelEntity {
     public int Id { get; set; }
     public int GroupId { get; set; }
     public virtual Group? Group { get; set; }
