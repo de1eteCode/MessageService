@@ -48,7 +48,7 @@ public class ChangeUserCommand : BotCommandAction {
         var roleId = splitedText.Last();
 
         if (int.TryParse(roleId, out int roleIdNum)) {
-            var selectedRoleUser = roles.FirstOrDefault(e => e.RoleId == roleIdNum);
+            var selectedRoleUser = roles.FirstOrDefault(e => e.AlternativeId == roleIdNum);
 
             if (selectedRoleUser == null) {
                 await botClient.SendTextMessageAsync(privateChatId, "Я не нашел роль под id " + roleIdNum);
@@ -74,7 +74,7 @@ public class ChangeUserCommand : BotCommandAction {
             return botClient.SendTextMessageAsync(privateChatId,
                 "Синтаксис изменения пользователя: /changeuser [tg user id] [id роли]\n" +
                 "Доступные роли:\n" +
-                String.Join("\n", roles.Select(e => String.Join(" - ", e.RoleId, e.RoleName))));
+                String.Join("\n", roles.Select(e => String.Join(" - ", e.AlternativeId, e.Name))));
         }
     }
 }

@@ -7,11 +7,12 @@ namespace DataLibrary.EntityConfigurations;
 internal class GroupConfiguration : IEntityTypeConfiguration<Group> {
 
     public void Configure(EntityTypeBuilder<Group> builder) {
-        builder.HasKey(e => e.UID)
-            .HasName("Groups_pkey");
+        builder.HasKey(e => e.UID);
 
         builder.HasIndex(e => e.AlternativeId, "groups_alternativeid_unique")
             .IsUnique();
+
+        builder.Property(e => e.AlternativeId).ValueGeneratedOnAdd();
 
         builder.Property(e => e.UID).HasDefaultValueSql("uuid_generate_v4()");
 

@@ -31,16 +31,15 @@ public class AddUserCommand : BotCommandAction {
             return;
         }
 
-        var splitedText = msgText.Split(new char[] { ' ' });
+        var splitedText = msgText.Split(' ');
 
-        if (splitedText.Length < 3) {
+        if (splitedText.Length != 3) {
             await SendDefaultMsg();
             return;
         }
 
         var idTelegramStr = splitedText[(int)PositionArgs.TelegramId];
-        long idTelegram;
-        if (long.TryParse(idTelegramStr, out idTelegram) == false) {
+        if (long.TryParse(idTelegramStr, out long idTelegram) == false) {
             await botClient.SendTextMessageAsync(chatId, $"{idTelegramStr} не похож на идентификатор пользователя Telegram");
             return;
         }
@@ -56,7 +55,7 @@ public class AddUserCommand : BotCommandAction {
         var roleId = splitedText[(int)PositionArgs.RoleId];
 
         if (int.TryParse(roleId, out int roleIdNum)) {
-            var selectedRoleUser = roles.FirstOrDefault(e => e.RoleId == roleIdNum);
+            var selectedRoleUser = roles.FirstOrDefault(e => e.AlternativeId == roleIdNum);
 
             if (selectedRoleUser == null) {
                 await botClient.SendTextMessageAsync(chatId, "Я не нашел роль под id " + roleIdNum);
@@ -67,14 +66,14 @@ public class AddUserCommand : BotCommandAction {
                 TelegramId = idTelegram,
                 Name = String.Join(" ", splitedText.Skip((int)PositionArgs.Name)),
                 Role = selectedRoleUser,
-                RoleId = selectedRoleUser.RoleId
+                RoleUID = selectedRoleUser.UID
             };
 
             context.Entry(newUser).State = EntityState.Added;
 
             await context.SaveChangesAsync();
 
-            await botClient.SendTextMessageAsync(chatId, $"Пользователь {newUser.Name} был успешно добавлен с ролью {newUser.Role.RoleName}");
+            await botClient.SendTextMessageAsync(chatId, $"Пользователь {newUser.Name} был успешно добавлен с ролью {newUser.Role.Name}");
         }
         else {
             await botClient.SendTextMessageAsync(chatId, $"Хм, я думаю {roleId} не похож на те идентификаторы, что я отправил");
@@ -86,7 +85,7 @@ public class AddUserCommand : BotCommandAction {
             return botClient.SendTextMessageAsync(chatId,
                 "Синтаксис для добавления пользователя: /adduser [id роль] [id telegram] [Имя]\n" +
                 "Доступные роли:\n" +
-                String.Join("\n", roles.Select(e => String.Join(" - ", e.RoleId, e.RoleName))));
+                String.Join("\n", roles.OrderBy(e => e.AlternativeId).Select(e => String.Join(" - ", e.AlternativeId, e.Name))));
         }
     }
 

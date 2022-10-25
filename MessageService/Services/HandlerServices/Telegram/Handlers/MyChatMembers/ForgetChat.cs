@@ -22,7 +22,7 @@ public class ForgetChat {
         var context = _dbService.GetDBContext();
 
         // проверка на чат
-        var chat = await context.Chats.FirstOrDefaultAsync(e => e.TelegramChatId!.Equals(chatMemberUpdate.Chat.Id.ToString()));
+        var chat = await context.Chats.SingleOrDefaultAsync(e => e.TelegramChatId!.Equals(chatMemberUpdate.Chat.Id));
 
         if (chat != null) {
             // бот знает о чате и надо пометить что его кикнули

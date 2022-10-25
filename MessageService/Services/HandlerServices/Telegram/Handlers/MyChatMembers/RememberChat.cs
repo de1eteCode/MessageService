@@ -21,7 +21,7 @@ public class RememberChat {
         var context = _dbService.GetDBContext();
 
         // проверка на ранее добавления бота в чат
-        var chat = await context.Chats.FirstOrDefaultAsync(e => e.TelegramChatId!.Equals(chatMemberUpdate.Chat.Id.ToString()));
+        var chat = await context.Chats.SingleOrDefaultAsync(e => e.TelegramChatId!.Equals(chatMemberUpdate.Chat.Id));
 
         if (chat != null) {
             // бот ранее состоял в этом чате
@@ -34,6 +34,7 @@ public class RememberChat {
         else {
             // бот в первые в этом чате
             chat = new DataLibrary.Models.Chat() {
+                IsJoined = true,
                 TelegramChatId = chatMemberUpdate.Chat.Id,
                 Name = chatMemberUpdate.Chat.Title!
             };

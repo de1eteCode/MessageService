@@ -7,8 +7,7 @@ namespace DataLibrary.EntityConfigurations;
 internal class ChatConfiguration : IEntityTypeConfiguration<Chat> {
 
     public void Configure(EntityTypeBuilder<Chat> builder) {
-        builder.HasKey(e => e.UID)
-                .HasName("Chats_pkey");
+        builder.HasKey(e => e.UID);
 
         builder.Property(e => e.UID).HasDefaultValueSql("uuid_generate_v4()");
         builder.Property(e => e.KickedByUserLogin).HasMaxLength(255);

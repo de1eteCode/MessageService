@@ -29,7 +29,7 @@ public class AddGroupCommand : BotCommandAction {
         }
 
         var context = _dbService.GetDBContext();
-        var addedGroupUser = await context.Users.FirstOrDefaultAsync(e => e.TelegramId!.Equals(message.From!.Id.ToString()));
+        var addedGroupUser = await context.Users.FirstOrDefaultAsync(e => e.TelegramId!.Equals(message.From!.Id));
 
         if (addedGroupUser == null) {
             await botClient.SendTextMessageAsync(chatId, "Странно, я не нашел твоей учетной записи у себя в базе");
@@ -37,15 +37,18 @@ public class AddGroupCommand : BotCommandAction {
         }
 
         var newGroup = new Group() {
-            Name = msg,
-            UserGroups = new List<UserGroup>() {
-                addedGroupUser
-            }
+            Name = msg
+        };
+
+        var userGroup = new UserGroup() {
+            Group = newGroup,
+            User = addedGroupUser,
         };
 
         context.Entry(newGroup).State = EntityState.Added;
+        context.Entry(userGroup).State = EntityState.Added;
         await context.SaveChangesAsync();
 
-        await botClient.SendTextMessageAsync(chatId, $"Группа \"{newGroup.Title}\" успешно добавлена под идентификатором: {newGroup.GroupId}");
+        await botClient.SendTextMessageAsync(chatId, $"Группа \"{newGroup.Name}\" успешно добавлена под идентификатором: {newGroup.AlternativeId}");
     }
 }
