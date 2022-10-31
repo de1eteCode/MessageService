@@ -3,20 +3,18 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DataLibrary.Migrations
-{
-    public partial class init : Migration
-    {
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+namespace DataLibrary.Migrations {
+
+    public partial class init : Migration {
+
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.AlterDatabase()
                 .Annotation("Npgsql:PostgresExtension:uuid-ossp", ",,");
 
             migrationBuilder.CreateTable(
                 name: "Chats",
-                columns: table => new
-                {
-                    UID = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
+                columns: table => new {
+                    UID = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "public.uuid_generate_v4()"),
                     TelegramChatId = table.Column<long>(type: "bigint", nullable: false),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     IsJoined = table.Column<bool>(type: "boolean", nullable: false),
@@ -24,48 +22,41 @@ namespace DataLibrary.Migrations
                     KickedByUserLogin = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     KickedTime = table.Column<DateTime>(type: "timestamp(0) with time zone", precision: 0, nullable: true)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Chats", x => x.UID);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Groups",
-                columns: table => new
-                {
-                    UID = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
+                columns: table => new {
+                    UID = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "public.uuid_generate_v4()"),
                     AlternativeId = table.Column<int>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Groups", x => x.UID);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Roles",
-                columns: table => new
-                {
-                    UID = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
+                columns: table => new {
+                    UID = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "public.uuid_generate_v4()"),
                     Name = table.Column<string>(type: "character varying(120)", maxLength: 120, nullable: false),
                     AlternativeId = table.Column<int>(type: "integer", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Roles", x => x.UID);
                 });
 
             migrationBuilder.CreateTable(
                 name: "ChatGroups",
-                columns: table => new
-                {
-                    UID = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
+                columns: table => new {
+                    UID = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "public.uuid_generate_v4()"),
                     ChatUID = table.Column<Guid>(type: "uuid", nullable: false),
                     GroupUID = table.Column<Guid>(type: "uuid", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_ChatGroups", x => x.UID);
                     table.ForeignKey(
                         name: "FK_ChatGroups_Chats_ChatUID",
@@ -81,15 +72,13 @@ namespace DataLibrary.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Users",
-                columns: table => new
-                {
-                    UID = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
+                columns: table => new {
+                    UID = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "public.uuid_generate_v4()"),
                     TelegramId = table.Column<long>(type: "bigint", nullable: false),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     RoleUID = table.Column<Guid>(type: "uuid", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_Users", x => x.UID);
                     table.ForeignKey(
                         name: "FK_Users_Roles_RoleUID",
@@ -100,14 +89,12 @@ namespace DataLibrary.Migrations
 
             migrationBuilder.CreateTable(
                 name: "UserGroups",
-                columns: table => new
-                {
-                    UID = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
+                columns: table => new {
+                    UID = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "public.uuid_generate_v4()"),
                     GroupUID = table.Column<Guid>(type: "uuid", nullable: false),
                     UserUID = table.Column<Guid>(type: "uuid", nullable: false)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_UserGroups", x => x.UID);
                     table.ForeignKey(
                         name: "FK_UserGroups_Groups_GroupUID",
@@ -169,8 +156,7 @@ namespace DataLibrary.Migrations
                 column: "RoleUID");
         }
 
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropTable(
                 name: "ChatGroups");
 

@@ -27,7 +27,6 @@ public class AddUserToGroupCommand : BotCommandAction {
             return;
         }
 
-
         // парсинг данных
         var splitedText = msgText.Split(' ');
 
@@ -50,15 +49,8 @@ public class AddUserToGroupCommand : BotCommandAction {
 
         var context = _dbService.GetDBContext();
 
-
-        var ownerUser = await context.Users.SingleOrDefaultAsync(e => e.TelegramId.Equals(message.From!.Id));
-        if (ownerUser == null) {
-            await botClient.SendTextMessageAsync(chatId, "Странно, я не нашел тебя в своей базе данных");
-            return;
-        }
-
         // поиск данных в бд
-        var group = ownerUser.UserGroups.FirstOrDefault(e => e.Group.AlternativeId.Equals(groupAltIdToAdd));
+        var group = await context.Groups.SingleOrDefaultAsync(e => e.AlternativeId.Equals(groupAltIdToAdd));
         if (group == null) {
             await botClient.SendTextMessageAsync(chatId, $"Группа с идентификатором {groupAltIdToAdd} не найдена");
             return;

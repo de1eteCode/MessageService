@@ -30,7 +30,7 @@ namespace DataLibrary.Migrations
                     b.Property<Guid>("UID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
+                        .HasDefaultValueSql("public.uuid_generate_v4()");
 
                     b.Property<bool>("IsJoined")
                         .HasColumnType("boolean");
@@ -64,7 +64,7 @@ namespace DataLibrary.Migrations
                     b.Property<Guid>("UID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
+                        .HasDefaultValueSql("public.uuid_generate_v4()");
 
                     b.Property<Guid>("ChatUID")
                         .HasColumnType("uuid");
@@ -89,7 +89,7 @@ namespace DataLibrary.Migrations
                     b.Property<Guid>("UID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
+                        .HasDefaultValueSql("public.uuid_generate_v4()");
 
                     b.Property<int>("AlternativeId")
                         .HasColumnType("integer");
@@ -112,7 +112,7 @@ namespace DataLibrary.Migrations
                     b.Property<Guid>("UID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
+                        .HasDefaultValueSql("public.uuid_generate_v4()");
 
                     b.Property<int>("AlternativeId")
                         .HasColumnType("integer");
@@ -155,7 +155,7 @@ namespace DataLibrary.Migrations
                     b.Property<Guid>("UID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
+                        .HasDefaultValueSql("public.uuid_generate_v4()");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -180,7 +180,7 @@ namespace DataLibrary.Migrations
                     b.Property<Guid>("UID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
+                        .HasDefaultValueSql("public.uuid_generate_v4()");
 
                     b.Property<Guid>("GroupUID")
                         .HasColumnType("uuid");
