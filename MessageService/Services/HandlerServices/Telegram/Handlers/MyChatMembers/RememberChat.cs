@@ -29,10 +29,11 @@ public class RememberChat {
             chat.Name = chatMemberUpdate.Chat.Title!;
             chat.KickedTime = null;
             chat.KickedByUserLogin = null;
+            chat.KickedByUserId = null;
             context.Entry(chat).State = EntityState.Modified;
         }
         else {
-            // бот в первые в этом чате
+            // бот впервые в этом чате
             chat = new DataLibrary.Models.Chat() {
                 IsJoined = true,
                 TelegramChatId = chatMemberUpdate.Chat.Id,

@@ -1,0 +1,42 @@
+﻿@page "/viewchats"
+@inherits ViewChatsBase
+
+<h3>ViewChats</h3>
+
+
+@if (_chats == null) {
+	<MessageService.Components.Loader />
+}
+else {
+	<table class="table">
+		<thead>
+			<tr>
+				<th scope="col">#</th>
+				<th scope="col">UID</th>
+				<th scope="col">Name</th>
+				<th scope="col">Telegram ID</th>
+				<th scope="col">Is joined</th>
+				<th scope="col">Kicked (user id)</th>
+				<th scope="col">Kicked (user login)</th>
+				<th scope="col">Kicked (time)</th>
+			</tr>
+		</thead>
+		<tbody>
+			@{
+				var iterator = 1;
+				foreach (var chat in _chats) {
+					<tr>
+						<th scope="row">@(iterator++)</th>
+						<th>@chat.UID</th>
+						<th>@chat.Name</th>
+						<th>@chat.TelegramChatId</th>
+						<th>@chat.IsJoined</th>
+						<th>@chat.KickedByUserId</th>
+						<th>@chat.KickedByUserLogin</th>
+						<th>@chat.KickedTime</th>
+					</tr>
+				}
+			}
+		</tbody>
+	</table>
+}

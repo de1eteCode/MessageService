@@ -29,6 +29,7 @@ public class ForgetChat {
             chat.IsJoined = false;
             chat.KickedTime = chatMemberUpdate.Date;
             chat.KickedByUserLogin = chatMemberUpdate.From?.Username ?? "unknown user";
+            chat.KickedByUserId = chatMemberUpdate.From?.Id ?? -1;
             context.Entry(chat).State = EntityState.Modified;
         }
         else {
@@ -38,6 +39,7 @@ public class ForgetChat {
                 Name = chatMemberUpdate.Chat!.Title!,
                 IsJoined = false,
                 KickedByUserLogin = chatMemberUpdate.From?.Username ?? "unknown user",
+                KickedByUserId = chatMemberUpdate.From?.Id ?? -1,
                 KickedTime = chatMemberUpdate.Date
             };
             context.Entry(chat).State = EntityState.Added;
