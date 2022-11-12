@@ -1,7 +1,7 @@
 ﻿using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure;
+namespace Application.Common.Interfaces;
 
 public interface IDataContext {
     public DbSet<Chat> Chats { get; set; }

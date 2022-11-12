@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using Application.Common.Interfaces;
+using Domain.Models;
 using Infrastructure.Data.EntityConfigurations;
 using Microsoft.EntityFrameworkCore;
 

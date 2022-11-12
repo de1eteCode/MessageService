@@ -83,7 +83,7 @@ public class TelegramBotClientLimit : TelegramBotClient {
             cancellationToken: cancellationToken
         ).ConfigureAwait(false);
 
-        await Task.Delay(RPS);
+        await Task.Delay(RPS, cancellationToken);
 
         // Освобождение свободного слота
         _semaphore.Release();

@@ -1,7 +1,7 @@
 ﻿namespace Domain.Models;
 
 /// <summary>
-/// Сущеность Telegram чата
+/// Описание сущности Telegram чата
 /// </summary>
 public class Chat : BaseEntity {
 
