@@ -1,14 +1,11 @@
-﻿using System.Diagnostics;
-using System.Text;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using TelegramService.Attributes;
 using TelegramService.Extensions;
-using TelegramService.Models;
 
 namespace TelegramService.Commands;
 
@@ -18,11 +15,9 @@ namespace TelegramService.Commands;
 [UserRole("Системный администратор")]
 internal class GetChatsInfoCommand : BotCommandAction {
     private readonly IDataContext _context;
-    private readonly TelegramSettings _tgConfiguration;
 
-    public GetChatsInfoCommand(IDataContext context, IOptionsMonitor<TelegramSettings> optionsMonitor) : base("getchatsinfo", "Получение информации о всех чатах, которые есть в БД") {
+    public GetChatsInfoCommand(IDataContext context) : base("getchatsinfo", "Получение информации о всех чатах, которые есть в БД") {
         _context = context;
-        _tgConfiguration = optionsMonitor.CurrentValue;
     }
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {

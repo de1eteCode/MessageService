@@ -6,7 +6,7 @@ using Telegram.Bot.Types.Enums;
 using TelegramService.Interfaces;
 using TelegramService.PassiveCommands;
 
-namespace MessageService.Services.HandlerServices.Telegram.Handlers;
+namespace TelegramService.Handlers;
 
 /// <summary>
 /// Обработчик, отвечающий за события добавления/исключения бота в чатах

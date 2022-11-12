@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
 
-internal class DataContext : DbContext, IDataContext {
+public class DataContext : DbContext, IDataContext {
 
     public DataContext(DbContextOptions<DataContext> options)
         : base(options) {

@@ -9,7 +9,7 @@ namespace TelegramService.AttributeValidators;
 /// <summary>
 /// Валидация телеграмм пользователя по UserName
 /// </summary>
-internal class TelegramLoginValidator : BaseValidator<LoginAttribute>, IValidator {
+internal class LoginValidator : BaseValidator<LoginAttribute>, IValidator {
 
     public Task<ValidatorResult> IsValidAsync<T>(User user, T obj)
         where T : BotCommandAction {

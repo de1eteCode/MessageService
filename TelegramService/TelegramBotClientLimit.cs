@@ -9,8 +9,13 @@ using TelegramService.Extensions;
 
 namespace TelegramService;
 
+/// <summary>
+/// Клиент для работы с Telegram api, реализуюзий RPS (Rate per second) механизм
+/// </summary>
 internal class TelegramBotClientLimit : TelegramBotClient {
     private readonly SemaphoreSlim _semaphore;
+    private readonly TelegramBotClientOptions _options;
+    private readonly HttpClient _httpClient;
 
     /// <summary>
     /// Время выполнения <see cref="Rate"/> операций
@@ -26,9 +31,6 @@ internal class TelegramBotClientLimit : TelegramBotClient {
     /// Время ожидания после выполнения 1 операции
     /// </summary>
     public TimeSpan RPS => TimeSpan.FromTicks(TimeForOperation.Ticks / Rate);
-
-    private readonly TelegramBotClientOptions _options;
-    private readonly HttpClient _httpClient;
 
     public new event AsyncEventHandler<ApiRequestEventArgs>? OnMakingApiRequest;
 
@@ -46,12 +48,19 @@ internal class TelegramBotClientLimit : TelegramBotClient {
         _options = GetFieldObj<TelegramBotClientOptions>(nameof(_options));
     }
 
+    /// <summary>
+    /// Получение приватных полей родителя
+    /// </summary>
+    /// <typeparam name="T">Тип свойства</typeparam>
+    /// <param name="fieldName">Имя приватного поля</param>
+    /// <returns>Значение приватного поля</returns>
     private T GetFieldObj<T>(string fieldName) {
         var type = typeof(TelegramBotClient);
         var filed = type.GetField(fieldName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
         return (T)filed!.GetValue(this)!;
     }
 
+    /// <inheritdoc/>
     public override async Task<TResponse> MakeRequestAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default) {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
 
