@@ -11,10 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RPSLimitTelegramBotLibrary"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLibrary", "DataLibrary\DataLibrary.csproj", "{88278723-B630-447D-9480-4D63E3928FAC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Temp", "Temp", "{D4DECFAF-9443-4855-A9BC-23E018569B13}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PullDataProd", "PullDataProd\PullDataProd.csproj", "{92090B84-2FCE-4368-83F2-064E1B1569F8}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,10 +29,6 @@ Global
 		{88278723-B630-447D-9480-4D63E3928FAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88278723-B630-447D-9480-4D63E3928FAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88278723-B630-447D-9480-4D63E3928FAC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{92090B84-2FCE-4368-83F2-064E1B1569F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{92090B84-2FCE-4368-83F2-064E1B1569F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{92090B84-2FCE-4368-83F2-064E1B1569F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{92090B84-2FCE-4368-83F2-064E1B1569F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -44,7 +36,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{653EF9B1-F344-411A-8445-FF5393D9598F} = {DA2AC3B5-2432-4674-B79C-36D36AC51877}
 		{88278723-B630-447D-9480-4D63E3928FAC} = {DA2AC3B5-2432-4674-B79C-36D36AC51877}
-		{92090B84-2FCE-4368-83F2-064E1B1569F8} = {D4DECFAF-9443-4855-A9BC-23E018569B13}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6A05DC36-11A9-4C3B-841F-28BB9560E9DB}
