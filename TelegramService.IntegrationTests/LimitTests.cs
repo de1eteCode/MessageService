@@ -89,6 +89,56 @@ public class LimitTests {
         Assert.IsTrue(3 <= stopwatch.Elapsed.Seconds);
     }
 
+    [TestMethod]
+    public async Task Test_Max15Calls_15Call_Minimum1Sec() {
+        var bot = BuildBot(15);
+        var stopwatch = new Stopwatch();
+        var repeat = 15;
+        var tasks = Enumerable.Range(0, repeat).Select(async e => await bot.GetMeAsync());
+
+        stopwatch.Start();
+
+        var res = await Task.WhenAll(tasks);
+
+        stopwatch.Stop();
+
+        var first = res.FirstOrDefault();
+
+        Assert.IsNotNull(first);
+
+        foreach (var ident in res) {
+            Assert.IsNotNull(ident);
+            Assert.AreEqual(ident.Id, first.Id);
+        }
+
+        Assert.IsTrue(1 <= stopwatch.Elapsed.Seconds);
+    }
+
+    [TestMethod]
+    public async Task Test_Max15Calls_60Call_Minimum4Sec() {
+        var bot = BuildBot(15);
+        var stopwatch = new Stopwatch();
+        var repeat = 60;
+        var tasks = Enumerable.Range(0, repeat).Select(async e => await bot.GetMeAsync());
+
+        stopwatch.Start();
+
+        var res = await Task.WhenAll(tasks);
+
+        stopwatch.Stop();
+
+        var first = res.FirstOrDefault();
+
+        Assert.IsNotNull(first);
+
+        foreach (var ident in res) {
+            Assert.IsNotNull(ident);
+            Assert.AreEqual(ident.Id, first.Id);
+        }
+
+        Assert.IsTrue(4 <= stopwatch.Elapsed.Seconds);
+    }
+
     private TelegramBotClientLimit BuildBot(int limit) {
         if (limit < 1) {
             throw new ArgumentException(nameof(limit));
