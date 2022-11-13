@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Application.Common.Interfaces;
 
-public interface IDataContext {
+public interface IDataContext : IDisposable {
     public DbSet<Chat> Chats { get; set; }
     public DbSet<ChatGroup> ChatGroups { get; set; }
     public DbSet<Group> Groups { get; set; }

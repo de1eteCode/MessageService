@@ -21,7 +21,7 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
     private readonly CancellationTokenSource _tokenSource;
     private readonly ReceiverOptions _receiverOptions;
 
-    private readonly Dictionary<UpdateType, Func<ITelegramBotClient, Update, CancellationToken, Task>> _supportedUpdates;
+    private readonly Dictionary<UpdateType, Func<ITelegramBotClient, Update, CancellationToken, IServiceProvider, Task>> _supportedUpdates;
 
     private User _meUser = default!;
 
@@ -29,8 +29,8 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
 
     public TelegramHostedService(ILogger<TelegramHostedService> logger, IOptionsMonitor<TelegramSettings> optionsMonitor, IServiceScopeFactory scopeFactory) {
         _supportedUpdates = new() {
-            { UpdateType.Message, (client, update, ct) => GetHandlerForMessageType(client, update.Message, ct) },
-            { UpdateType.MyChatMember, (client, update, ct) => GetHandlerForMessageType(client, update.MyChatMember, ct) }
+            { UpdateType.Message, (client, update, ct, serviceProvider) => GetHandlerForMessageType(client, update.Message, ct, serviceProvider) },
+            { UpdateType.MyChatMember, (client, update, ct, serviceProvider) => GetHandlerForMessageType(client, update.MyChatMember, ct, serviceProvider) }
         };
 
         _logger = logger;
@@ -56,10 +56,10 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
     /// Метод, предоставляемый <see cref="IHostedService"/>
     /// </summary>
     public Task StartAsync(CancellationToken cancellationToken) {
-        using var scope = _scopeFactory.CreateScope();
-
-        var commandsBot = scope.ServiceProvider.GetServices<BotCommandAction>();
-        _telegramClient.SetMyCommandsAsync(commandsBot, cancellationToken: _tokenSource.Token);
+        using (var scope = _scopeFactory.CreateScope()) {
+            var commandsBot = scope.ServiceProvider.GetServices<BotCommandAction>();
+            _telegramClient.SetMyCommandsAsync(commandsBot, cancellationToken: _tokenSource.Token);
+        }
 
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -95,21 +95,22 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
     /// <param name="update"></param>
     /// <param name="cancellationToken">Токен отмены операции</param>
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken) {
-        if (_supportedUpdates.TryGetValue(update.Type, out var handler)) {
-            cancellationToken.ThrowIfCancellationRequested();
-            await handler(botClient, update, cancellationToken).ConfigureAwait(false);
-        }
-        else {
-            _logger.LogError($"Handle update unsupported type: {update.Type}");
+        using (var scope = _scopeFactory.CreateScope()) {
+            if (_supportedUpdates.TryGetValue(update.Type, out var handler)) {
+                cancellationToken.ThrowIfCancellationRequested();
+                await handler(botClient, update, cancellationToken, scope.ServiceProvider).ConfigureAwait(false);
+            }
+            else {
+                _logger.LogError($"Handle update unsupported type: {update.Type}");
+            }
         }
     }
 
     /// <summary>
     /// Получение хендлера для сообщения типа <typeparamref name="T"/>
     /// </summary>
-    private Task GetHandlerForMessageType<T>(ITelegramBotClient botClient, T arg, CancellationToken cancellationToken) {
-        using var scope = _scopeFactory.CreateScope();
-        var service = scope.ServiceProvider.GetService<IUpdateHandler<T>>() ?? throw new Exception($"Not found service typeof {typeof(IUpdateHandler<T>)}.");
+    private Task GetHandlerForMessageType<T>(ITelegramBotClient botClient, T arg, CancellationToken cancellationToken, IServiceProvider scope) {
+        var service = scope.GetService<IUpdateHandler<T>>() ?? throw new Exception($"Not found service typeof {typeof(IUpdateHandler<T>)}.");
         return service.HandleUpdateAsync(botClient, arg, cancellationToken);
     }
 
