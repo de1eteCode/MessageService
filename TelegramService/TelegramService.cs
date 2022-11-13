@@ -8,13 +8,14 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TelegramService.Commands;
+using TelegramService.Handlers;
 using TelegramService.Interfaces;
 using TelegramService.Models;
 
 namespace TelegramService;
 
 public class TelegramHostedService : IHandlerHostedService, IWhoIam {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<TelegramHostedService> _logger;
     private readonly TelegramBotClient _telegramClient;
     private readonly CancellationTokenSource _tokenSource;
@@ -26,7 +27,7 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
 
     public bool IsHosted { get; private set; }
 
-    public TelegramHostedService(ILogger<TelegramHostedService> logger, IOptionsMonitor<TelegramSettings> optionsMonitor, IServiceProvider serviceProvider) {
+    public TelegramHostedService(ILogger<TelegramHostedService> logger, IOptionsMonitor<TelegramSettings> optionsMonitor, IServiceScopeFactory scopeFactory) {
         _supportedUpdates = new() {
             { UpdateType.Message, (client, update, ct) => GetHandlerForMessageType(client, update.Message, ct) },
             { UpdateType.MyChatMember, (client, update, ct) => GetHandlerForMessageType(client, update.MyChatMember, ct) }
@@ -34,7 +35,7 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
 
         _logger = logger;
 
-        _serviceProvider = serviceProvider;
+        _scopeFactory = scopeFactory;
         _receiverOptions = new ReceiverOptions() {
             AllowedUpdates = _supportedUpdates.Keys.ToArray()
         };
@@ -55,12 +56,20 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
     /// Метод, предоставляемый <see cref="IHostedService"/>
     /// </summary>
     public Task StartAsync(CancellationToken cancellationToken) {
-        var commandsBot = _serviceProvider.GetServices<BotCommandAction>();
+        using var scope = _scopeFactory.CreateScope();
+
+        var commandsBot = scope.ServiceProvider.GetServices<BotCommandAction>();
         _telegramClient.SetMyCommandsAsync(commandsBot, cancellationToken: _tokenSource.Token);
 
         cancellationToken.ThrowIfCancellationRequested();
 
         _telegramClient.StartReceiving(HandleUpdateAsync, HandlePollingErrorAsync, _receiverOptions, _tokenSource.Token);
+
+        if (cancellationToken.IsCancellationRequested) {
+            _tokenSource.Cancel();
+            cancellationToken.ThrowIfCancellationRequested();
+        }
+
         _logger.LogInformation($"Запущен {nameof(TelegramService)}");
         IsHosted = true;
         return Task.CompletedTask;
@@ -99,7 +108,8 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
     /// Получение хендлера для сообщения типа <typeparamref name="T"/>
     /// </summary>
     private Task GetHandlerForMessageType<T>(ITelegramBotClient botClient, T arg, CancellationToken cancellationToken) {
-        var service = _serviceProvider.GetService<IUpdateHandler<T>>() ?? throw new Exception($"Not found service typeof {typeof(IUpdateHandler<T>)}.");
+        using var scope = _scopeFactory.CreateScope();
+        var service = scope.ServiceProvider.GetService<IUpdateHandler<T>>() ?? throw new Exception($"Not found service typeof {typeof(IUpdateHandler<T>)}.");
         return service.HandleUpdateAsync(botClient, arg, cancellationToken);
     }
 

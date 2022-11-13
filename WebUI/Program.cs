@@ -13,7 +13,7 @@ public class Program {
         var builder = WebApplication.CreateBuilder(args);
 
         // Telegram settings
-        builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelgeramSettings"));
+        builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelegramSettings"));
 
         // Infrastructure: EF Core
         builder.Services.AddDbContext<IDataContext, DataContext>(options => {
@@ -23,8 +23,7 @@ public class Program {
 #if DEBUG
             options.EnableSensitiveDataLogging();
 #endif
-        },
-        contextLifetime: ServiceLifetime.Transient);
+        });
 
         // Handlers
         builder.Services.AddTelegramHostedService();

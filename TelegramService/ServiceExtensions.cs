@@ -20,11 +20,11 @@ public static class ServiceExtensions {
 
     private static IServiceCollection AddTelegramHandler<T, THandler>(this IServiceCollection services)
         where THandler : class, IUpdateHandler<T> =>
-        services.AddTransient<IUpdateHandler<T>, THandler>();
+        services.AddScoped<IUpdateHandler<T>, THandler>();
 
     private static IServiceCollection AddTelegramValidator<T>(this IServiceCollection services)
         where T : class, IValidator =>
-        services.AddTransient<IValidator, T>();
+        services.AddScoped<IValidator, T>();
 
     public static IServiceCollection AddTelegramHostedService(this IServiceCollection services) => services
         // Handlers
@@ -56,10 +56,10 @@ public static class ServiceExtensions {
         .AddTransient<ForgetChat>()
         .AddTransient<RememberChat>()
 
-        .AddTransient<IWhoIam, TelegramHostedService>(service => (TelegramHostedService)service.GetRequiredService<TelegramHostedService>())
+        .AddTransient<IWhoIam, TelegramHostedService>(service => service.GetRequiredService<TelegramHostedService>())
         //.AddTransient<ITelegramSenderMessage, TelegramService>(service => (TelegramService)service.GetRequiredService<ITelegramService>())
 
         // service
-        .AddSingleton<IHandlerHostedService, TelegramHostedService>()
-        .AddHostedService(service => (TelegramHostedService)service.GetRequiredService<TelegramHostedService>());
+        .AddSingleton<TelegramHostedService>()
+        .AddHostedService<TelegramHostedService>(service => service.GetRequiredService<TelegramHostedService>());
 }
