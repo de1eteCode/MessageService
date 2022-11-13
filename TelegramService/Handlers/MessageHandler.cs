@@ -68,9 +68,6 @@ internal class MessageHandler : IUpdateHandler<Message> {
                     message.Text = String.Join(" ", message.Text!.Split(' ').Skip(1));
                     await command.ExecuteActionAsync(botClient, message, cancellationToken);
                 }
-                else {
-                    _logger.LogInformation("Not supported command: " + message.Text);
-                }
 
                 break;
 

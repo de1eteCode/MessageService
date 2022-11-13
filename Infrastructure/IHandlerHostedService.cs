@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Infrastructure.Enums;
+using Microsoft.Extensions.Hosting;
 
 namespace Infrastructure;
 
 public interface IHandlerHostedService : IHostedService {
-    public bool IsHosted { get; }
+    public ServiceState State { get; }
 }

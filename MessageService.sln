@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramService", "Telegram
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{AA49A1E9-C545-4DD3-A5CB-3E99F716A4C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramService.IntegrationTests", "TelegramService.IntegrationTests\TelegramService.IntegrationTests.csproj", "{A0E34BA9-A39A-49BE-B561-66D335F7F250}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramService.IntegrationTests", "TelegramService.IntegrationTests\TelegramService.IntegrationTests.csproj", "{A0E34BA9-A39A-49BE-B561-66D335F7F250}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

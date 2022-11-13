@@ -1,4 +1,5 @@
 ﻿using Infrastructure;
+using Infrastructure.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -25,8 +26,6 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
 
     private User _meUser = default!;
 
-    public bool IsHosted { get; private set; }
-
     public TelegramHostedService(ILogger<TelegramHostedService> logger, IOptionsMonitor<TelegramSettings> optionsMonitor, IServiceScopeFactory scopeFactory) {
         _supportedUpdates = new() {
             { UpdateType.Message, (client, update, ct, serviceProvider) => GetHandlerForMessageType(client, update.Message, ct, serviceProvider) },
@@ -51,6 +50,8 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
 
     #region Service method
 
+    public ServiceState State { get; private set; }
+
     /// <summary>
     /// Запуск сервиса
     /// Метод, предоставляемый <see cref="IHostedService"/>
@@ -58,7 +59,7 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
     public Task StartAsync(CancellationToken cancellationToken) {
         using (var scope = _scopeFactory.CreateScope()) {
             var commandsBot = scope.ServiceProvider.GetServices<BotCommandAction>();
-            _telegramClient.SetMyCommandsAsync(commandsBot, cancellationToken: _tokenSource.Token);
+            _telegramClient.SetMyCommandsAsync(commandsBot, scope: BotCommandScope.AllPrivateChats(), cancellationToken: _tokenSource.Token);
         }
 
         cancellationToken.ThrowIfCancellationRequested();
@@ -71,7 +72,7 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
         }
 
         _logger.LogInformation($"Запущен {nameof(TelegramService)}");
-        IsHosted = true;
+        State = ServiceState.Online;
         return Task.CompletedTask;
     }
 
@@ -82,7 +83,7 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
     public Task StopAsync(CancellationToken cancellationToken) {
         _tokenSource.Cancel();
         _logger.LogInformation($"Остановлен {nameof(TelegramService)}");
-        IsHosted = false;
+        State = ServiceState.Offline;
         return Task.CompletedTask;
     }
 
@@ -127,6 +128,8 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
         };
 
         _logger.LogError(msg);
+
+        State = ServiceState.FatalError;
 
         return Task.CompletedTask;
     }

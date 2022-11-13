@@ -20,7 +20,7 @@ public static class ServiceExtensions {
 
     private static IServiceCollection AddTelegramHandler<T, THandler>(this IServiceCollection services)
         where THandler : class, IUpdateHandler<T> =>
-        services.AddTransient<IUpdateHandler<T>, THandler>();
+        services.AddScoped<IUpdateHandler<T>, THandler>();
 
     private static IServiceCollection AddTelegramValidator<T>(this IServiceCollection services)
         where T : class, IValidator =>
