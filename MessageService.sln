@@ -17,6 +17,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Handlers", "Handlers", "{26
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramService", "TelegramService\TelegramService.csproj", "{45507038-78C6-4113-B7E5-AEB8C0DE8159}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{AA49A1E9-C545-4DD3-A5CB-3E99F716A4C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramService.IntegrationTests", "TelegramService.IntegrationTests\TelegramService.IntegrationTests.csproj", "{A0E34BA9-A39A-49BE-B561-66D335F7F250}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +47,10 @@ Global
 		{45507038-78C6-4113-B7E5-AEB8C0DE8159}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45507038-78C6-4113-B7E5-AEB8C0DE8159}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45507038-78C6-4113-B7E5-AEB8C0DE8159}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0E34BA9-A39A-49BE-B561-66D335F7F250}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0E34BA9-A39A-49BE-B561-66D335F7F250}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0E34BA9-A39A-49BE-B561-66D335F7F250}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0E34BA9-A39A-49BE-B561-66D335F7F250}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -54,6 +62,7 @@ Global
 		{A8B91B4B-20CE-4B1F-8115-8628F3493C21} = {5CCF0B4C-86FA-4C5A-8D74-F430E5D3FE12}
 		{2612862B-86F0-4851-BE71-A6F48398CFA9} = {5CCF0B4C-86FA-4C5A-8D74-F430E5D3FE12}
 		{45507038-78C6-4113-B7E5-AEB8C0DE8159} = {2612862B-86F0-4851-BE71-A6F48398CFA9}
+		{A0E34BA9-A39A-49BE-B561-66D335F7F250} = {AA49A1E9-C545-4DD3-A5CB-3E99F716A4C8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6A05DC36-11A9-4C3B-841F-28BB9560E9DB}

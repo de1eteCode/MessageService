@@ -12,7 +12,7 @@ namespace TelegramService;
 /// <summary>
 /// Клиент для работы с Telegram api, реализуюзий RPS (Rate per second) механизм
 /// </summary>
-internal class TelegramBotClientLimit : TelegramBotClient {
+public class TelegramBotClientLimit : TelegramBotClient {
     private readonly SemaphoreSlim _semaphore;
     private readonly TelegramBotClientOptions _options;
     private readonly HttpClient _httpClient;
