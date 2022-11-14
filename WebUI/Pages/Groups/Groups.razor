@@ -1,0 +1,34 @@
+﻿@page "/groups"
+@inherits GroupsBase
+
+<h2>Группы</h2>
+
+<table class="table text-center">
+    <thead>
+    <th scope="col">#</th>
+    <th scope="col">Уникальный идентификатор</th>
+    <th scope="col">Наименование</th>
+    <th scope="col">Количество чатов</th>
+    <th scope="col">Количество пользователей</th>
+    </thead>
+    <tbody>
+        @if (Groups is null) {
+            <Loader Title="Загрузка..." />
+        }
+        else {
+            int iterator = 1;
+            foreach (var group in Groups) {
+                <tr>
+                    <th scope="row">@(iterator++)</th>
+                    <th>@group.UID</th>
+                    <th>@group.Name</th>
+                    <th>@group.ChatGroups.Count()</th>
+                    <th>@group.UserGroups.Count()</th>
+                    <th>
+                        <button type="button" class="btn btn-info">Открыть карточку</button>
+                    </th>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
