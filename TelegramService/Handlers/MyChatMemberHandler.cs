@@ -21,8 +21,8 @@ internal class MyChatMemberHandler : IUpdateHandler<ChatMemberUpdated> {
     }
 
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, ChatMemberUpdated myChatMember, CancellationToken cancellationToken) {
-        // надстройка, чтобы обновления о изменениях бота работали только в группах
-        if (myChatMember.Chat.Type != ChatType.Group) {
+        // надстройка, чтобы обновления о изменениях бота работали только в группах и приватных группах
+        if (myChatMember.Chat.Type != ChatType.Group || myChatMember.Chat.Type != ChatType.Supergroup) {
             return;
         }
 
