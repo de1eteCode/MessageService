@@ -51,6 +51,7 @@ public static class ServiceExtensions {
         .AddTelegramCommand<GetMyIdCommand>()
         .AddTelegramCommand<StressTestCommand>()
         .AddTelegramCommand<AddUserToGroupCommand>()
+        .AddTelegramCommand<SendChatById>()
 
         // Chat members passive executeon
         .AddTransient<ForgetChat>()
