@@ -18,7 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Chats\Queries\" />
     <Folder Include="Groups\Commands\CreateGroup\" />
     <Folder Include="Groups\Commands\UpdateGroup\" />
     <Folder Include="Users\Commands\CreateUser\" />

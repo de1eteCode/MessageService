@@ -14,15 +14,7 @@ public class CreateChatCommandValidator : AbstractValidator<CreateChatCommand> {
             .NotEmpty();
 
         RuleFor(e => e.KickedUserLogin)
-            .MinimumLength(1)
-            .MaximumLength(255)
-            .Empty();
-
-        RuleFor(e => e.KickedUserId)
-            .Empty();
-
-        RuleFor(e => e.IsJoined)
-            .NotEmpty();
+            .MaximumLength(255);
 
         RuleFor(e => e.Time)
             .NotEmpty();
