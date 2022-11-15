@@ -1,4 +1,9 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Chats.Commands.CreateChat;
+using Application.Chats.Commands.UpdateChat;
+using Application.Chats.Queries.GetChat;
+using Application.Common.Interfaces;
+using Domain.Models;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot.Types;
@@ -10,40 +15,46 @@ namespace TelegramService.PassiveCommands;
 /// Если отсоедилнился бот, то забываем о существовании этого чата
 /// </summary>
 internal class ForgetChat {
-    private readonly IDataContext _context;
+    private readonly IMediator _mediator;
     private readonly ILogger<ForgetChat> _logger;
 
-    public ForgetChat(IDataContext context, ILogger<ForgetChat> logger) {
-        _context = context;
+    public ForgetChat(IMediator mediator, ILogger<ForgetChat> logger) {
+        _mediator = mediator;
         _logger = logger;
     }
 
     public async Task ExecuteActionAsync(ChatMemberUpdated chatMemberUpdate) {
-        // проверка на чат
-        var chat = await _context.Chats.SingleOrDefaultAsync(e => e.TelegramChatId!.Equals(chatMemberUpdate.Chat.Id));
+        var mediator_chat = await _mediator.Send(new GetChatCommand() { TelegramChatId = chatMemberUpdate.Chat.Id });
 
-        if (chat != null) {
-            // бот знает о чате и надо пометить что его кикнули
-            chat.IsJoined = false;
-            chat.KickedTime = chatMemberUpdate.Date;
-            chat.KickedByUserLogin = chatMemberUpdate.From?.Username ?? "unknown user";
-            chat.KickedByUserId = chatMemberUpdate.From?.Id ?? -1;
-            _context.Entry(chat).State = EntityState.Modified;
-        }
-        else {
-            // бот не знал о чате, на всякий случай запомним чат
-            chat = new Domain.Models.Chat() {
-                TelegramChatId = chatMemberUpdate.Chat.Id,
+        IRequest<Domain.Models.Chat> command = default!;
+
+        if (mediator_chat == null) {
+            // чат не существует в бд
+            command = new CreateChatCommand() {
+                TelegramChatId = chatMemberUpdate.Chat!.Id,
                 Name = chatMemberUpdate.Chat!.Title!,
                 IsJoined = false,
-                KickedByUserLogin = chatMemberUpdate.From?.Username ?? "unknown user",
-                KickedByUserId = chatMemberUpdate.From?.Id ?? -1,
-                KickedTime = chatMemberUpdate.Date
+                KickedUserLogin = chatMemberUpdate.From?.Username ?? "unknown user",
+                KickedUserId = chatMemberUpdate.From?.Id ?? -1,
+                Time = chatMemberUpdate.Date
             };
-            _context.Entry(chat).State = EntityState.Added;
+        }
+        else {
+            // чат существует в бд
+            command = new UpdateChatCommand() {
+                UID = mediator_chat.UID,
+                TelegramChatId = chatMemberUpdate.Chat!.Id,
+                Name = chatMemberUpdate.Chat!.Title!,
+                IsJoined = false,
+                KickedUserLogin = chatMemberUpdate.From?.Username ?? "unknown user",
+                KickedUserId = chatMemberUpdate.From?.Id ?? -1,
+                Time = chatMemberUpdate.Date
+            };
         }
 
-        await _context.SaveChangesAsync();
-        _logger.LogInformation($"Меня выгнали из группы {chat.Name}");
+        var result = await _mediator.Send(command);
+
+        // проверка на чат
+        _logger.LogInformation($"Меня выгнали из группы \"{chatMemberUpdate.Chat!.Title}\"");
     }
 }

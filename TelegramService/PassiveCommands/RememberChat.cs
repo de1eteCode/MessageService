@@ -1,4 +1,8 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Chats.Commands.CreateChat;
+using Application.Chats.Commands.UpdateChat;
+using Application.Chats.Queries.GetChat;
+using Application.Common.Interfaces;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot.Types;
@@ -9,40 +13,45 @@ namespace TelegramService.PassiveCommands;
 /// Обработчик для чата, который смотрит на то, кто присоединился.
 /// </summary>
 internal class RememberChat {
-    private readonly IDataContext _context;
+    private readonly IMediator _mediator;
     private readonly ILogger<RememberChat> _logger;
 
-    public RememberChat(IDataContext context, ILogger<RememberChat> logger) {
-        _context = context;
+    public RememberChat(IMediator mediator, ILogger<RememberChat> logger) {
+        _mediator = mediator;
         _logger = logger;
     }
 
     public async Task ExecuteActionAsync(ChatMemberUpdated chatMemberUpdate) {
-        // проверка на ранее добавления бота в чат
-        var chat = await _context.Chats.SingleOrDefaultAsync(e => e.TelegramChatId!.Equals(chatMemberUpdate.Chat.Id));
+        var mediator_chat = await _mediator.Send(new GetChatCommand() { TelegramChatId = chatMemberUpdate.Chat.Id });
 
-        if (chat != null) {
-            // бот ранее состоял в этом чате
-            chat.IsJoined = true;
-            chat.Name = chatMemberUpdate.Chat.Title!;
-            chat.KickedTime = null;
-            chat.KickedByUserLogin = null;
-            chat.KickedByUserId = null;
-            _context.Entry(chat).State = EntityState.Modified;
+        IRequest<Domain.Models.Chat> command = default!;
+
+        if (mediator_chat == null) {
+            // чат не существует в бд
+            command = new CreateChatCommand() {
+                TelegramChatId = chatMemberUpdate.Chat!.Id,
+                Name = chatMemberUpdate.Chat!.Title!,
+                IsJoined = false,
+                KickedUserLogin = chatMemberUpdate.From?.Username ?? "unknown user",
+                KickedUserId = chatMemberUpdate.From?.Id ?? -1,
+                Time = chatMemberUpdate.Date
+            };
         }
         else {
-            // бот впервые в этом чате
-            chat = new Domain.Models.Chat() {
-                IsJoined = true,
-                TelegramChatId = chatMemberUpdate.Chat.Id,
-                Name = chatMemberUpdate.Chat.Title!
+            // чат существует в бд
+            command = new UpdateChatCommand() {
+                UID = mediator_chat.UID,
+                TelegramChatId = chatMemberUpdate.Chat!.Id,
+                Name = chatMemberUpdate.Chat!.Title!,
+                IsJoined = false,
+                KickedUserLogin = chatMemberUpdate.From?.Username ?? "unknown user",
+                KickedUserId = chatMemberUpdate.From?.Id ?? -1,
+                Time = chatMemberUpdate.Date
             };
-
-            _context.Entry(chat).State = EntityState.Added;
         }
 
-        _logger.LogInformation($"Меня добавили в чат \"{chat.Name}\"");
+        var result = await _mediator.Send(command);
 
-        await _context.SaveChangesAsync();
+        _logger.LogInformation($"Меня добавили в чат \"{chatMemberUpdate.Chat!.Title}\"");
     }
 }
