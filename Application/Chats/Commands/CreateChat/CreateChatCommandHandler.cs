@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Domain.Models;
 using MediatR;
 
@@ -16,7 +11,22 @@ public class CreateChatCommandHandler : IRequestHandler<CreateChatCommand, Chat>
         _dataContext = dataContext;
     }
 
-    public Task<Chat> Handle(CreateChatCommand request, CancellationToken cancellationToken) {
-        throw new NotImplementedException();
+    public async Task<Chat> Handle(CreateChatCommand request, CancellationToken cancellationToken) {
+        var entity = new Chat() {
+            Name = request.Name,
+            IsJoined = request.IsJoined,
+            KickedByUserId = request.KickedUserId,
+            KickedByUserLogin = request.KickedUserLogin,
+            TelegramChatId = request.TelegramChatId,
+            KickedTime = request.Time
+        };
+
+        // event ?
+
+        _dataContext.Chats.Add(entity);
+
+        await _dataContext.SaveChangesAsync(cancellationToken);
+
+        return entity;
     }
 }

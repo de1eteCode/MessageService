@@ -1,8 +1,15 @@
 ﻿using Domain.Models;
 using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Application.Chats.Commands.CreateChat;
-public record CreateChatCommand : IRequest<Chat> {
+namespace Application.Chats.Commands.UpdateChat;
+public record UpdateChatCommand : IRequest<Chat> {
+    public Guid UID { get; set; }
+
     public long TelegramChatId { get; set; }
 
     public string Name { get; set; } = default!;

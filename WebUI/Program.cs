@@ -25,6 +25,9 @@ public class Program {
 #endif
         });
 
+        // Application services
+        builder.Services.AddApplicationServices();
+
         // Handlers
         builder.Services.AddTelegramHostedService();
 
