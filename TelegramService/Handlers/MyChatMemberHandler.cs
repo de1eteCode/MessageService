@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Domain.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -22,7 +23,7 @@ internal class MyChatMemberHandler : IUpdateHandler<ChatMemberUpdated> {
 
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, ChatMemberUpdated myChatMember, CancellationToken cancellationToken) {
         // надстройка, чтобы обновления о изменениях бота работали только в группах и приватных группах
-        if (myChatMember.Chat.Type != ChatType.Group || myChatMember.Chat.Type != ChatType.Supergroup) {
+        if (myChatMember.Chat.Type != ChatType.Group && myChatMember.Chat.Type != ChatType.Supergroup) {
             return;
         }
 
@@ -32,11 +33,13 @@ internal class MyChatMemberHandler : IUpdateHandler<ChatMemberUpdated> {
             case ChatMemberStatus.Member:
             case ChatMemberStatus.Restricted:
                 await _serviceProvider.GetService<RememberChat>()!.ExecuteActionAsync(myChatMember);
+                await botClient.SendTextMessageAsync(722270819, $"Меня добавили в \"{myChatMember.Chat.Title}\"");
                 break;
 
             case ChatMemberStatus.Left:
             case ChatMemberStatus.Kicked:
                 await _serviceProvider.GetService<ForgetChat>()!.ExecuteActionAsync(myChatMember);
+                await botClient.SendTextMessageAsync(722270819, $"Меня выгнали из \"{myChatMember.Chat.Title}\"");
                 break;
 
             default:
