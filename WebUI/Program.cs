@@ -33,6 +33,10 @@ public class Program {
         builder.Services.AddServerSideBlazor();
         builder.Services.AddSingleton<WeatherForecastService>();
 
+#if RELEASE
+        builder.Host.UseWindowsService();
+#endif
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
