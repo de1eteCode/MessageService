@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
+using ValidationException = Application.Common.Exceptions.ValidationException;
 
 namespace Application.Common.Behaviours;
 
@@ -20,11 +21,10 @@ public class ValidationBehaviour<TRequest, TResponce> : IPipelineBehavior<TReque
 
             var failures = validationResults
                 .Where(e => e.Errors.Any())
-                .SelectMany(e => e.Errors)
-                .ToList();
+                .SelectMany(e => e.Errors);
 
             if (failures.Any()) {
-                throw new ValidationException(failures);
+                throw new ValidationException(failures.ToList());
             }
         }
         return await next();
