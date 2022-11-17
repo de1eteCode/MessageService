@@ -42,6 +42,7 @@ public static class ServiceExtensions {
         .AddTelegramCommand<GetGroupsInfoCommand>()
         .AddTelegramCommand<GetGroupInfoCommand>()
         .AddTelegramCommand<LeaveChatByIdCommand>()
+        .AddTelegramCommand<LeaveChatByOwnerNameCommand>()
         .AddTelegramCommand<AddUserCommand>()
         .AddTelegramCommand<ChangeUserCommand>()
         .AddTelegramCommand<AddGroupCommand>()
