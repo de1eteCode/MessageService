@@ -20,8 +20,7 @@
   <ItemGroup>
     <Folder Include="Groups\Commands\CreateGroup\" />
     <Folder Include="Groups\Commands\UpdateGroup\" />
-    <Folder Include="Users\Commands\CreateUser\" />
-    <Folder Include="Users\Commands\UpdateUser\" />
+    <Folder Include="Roles\Commands\" />
   </ItemGroup>
 
 </Project>
