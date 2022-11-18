@@ -1,5 +1,8 @@
 ﻿using Application.Common.Interfaces;
+using Application.Groups.Commands.CreateGroup;
+using Application.Users.Queries.GetUser;
 using Domain.Models;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -12,10 +15,10 @@ namespace TelegramService.Commands;
 /// </summary>
 [UserRole("Системный администратор")]
 internal class AddGroupCommand : BotCommandAction {
-    private readonly IDataContext _context;
+    private readonly IMediator _mediator;
 
-    public AddGroupCommand(IDataContext context) : base("addgroup", "Добавление новой группы") {
-        _context = context;
+    public AddGroupCommand(IMediator mediator) : base("addgroup", "Добавление новой группы") {
+        _mediator = mediator;
     }
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
@@ -27,25 +30,17 @@ internal class AddGroupCommand : BotCommandAction {
             return;
         }
 
-        var addedGroupUser = await _context.Users.FirstOrDefaultAsync(e => e.TelegramId!.Equals(message.From!.Id));
+        var addedGroupUser = await _mediator.Send(new GetUserCommand() { TelegramId = message.From!.Id });
 
         if (addedGroupUser == null) {
             await botClient.SendTextMessageAsync(chatId, "Странно, я не нашел твоей учетной записи у себя в базе");
             return;
         }
 
-        var newGroup = new Group() {
-            Name = msg
-        };
-
-        var userGroup = new UserGroup() {
-            Group = newGroup,
-            User = addedGroupUser,
-        };
-
-        _context.Entry(newGroup).State = EntityState.Added;
-        _context.Entry(userGroup).State = EntityState.Added;
-        await _context.SaveChangesAsync();
+        var newGroup = await _mediator.Send(new CreateGroupCommand() {
+            Name = msg,
+            OwnerUserUID = addedGroupUser.UID
+        });
 
         await botClient.SendTextMessageAsync(chatId, $"Группа \"{newGroup.Name}\" успешно добавлена под идентификатором: {newGroup.AlternativeId}");
     }

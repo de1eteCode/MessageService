@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Infrastructure.Data;
-using Telegram.Bot.Types;
+﻿using Application.Chats.Queries.GetChat;
+using MediatR;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 using TelegramService.Attributes;
-using Application.Common.Interfaces;
 using TelegramService.Extensions;
 
 namespace TelegramService.Commands;
@@ -17,10 +12,10 @@ namespace TelegramService.Commands;
 /// </summary>
 [UserRole("Системный администратор")]
 internal class SendChatById : BotCommandAction {
-    private readonly IDataContext _context;
+    private readonly IMediator _mediator;
 
-    public SendChatById(IDataContext dataContext) : base("sendchatbyid", "Отправка сообщения в чат по его идентификатору Telegram") {
-        _context = dataContext;
+    public SendChatById(IMediator mediator) : base("sendchatbyid", "Отправка сообщения в чат по его идентификатору Telegram") {
+        _mediator = mediator;
     }
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
@@ -41,24 +36,24 @@ internal class SendChatById : BotCommandAction {
 
         var chatIdToSendText = splitedText.First();
         if (long.TryParse(chatIdToSendText, out long chatIdToSend) == false) {
-            await botClient.SendTextMessageAsync(chatId, $"{chatIdToSend} не похож на идентификатор группы");
+            await botClient.SendTextMessageAsync(chatId, $"{chatIdToSend} не похож на идентификатор группы", cancellationToken: cancellationToken);
             return;
         }
 
-        var chat = _context.Chats.FirstOrDefault(e => e.TelegramChatId.Equals(chatIdToSend));
+        var chat = await _mediator.Send(new GetChatCommand() { TelegramChatId = chatIdToSend }, cancellationToken);
 
         if (chat == null) {
-            await botClient.SendTextMessageAsync(chatId, $"Не нашел группу с идентификатором {chatIdToSend}");
+            await botClient.SendTextMessageAsync(chatId, $"Не нашел группу с идентификатором {chatIdToSend}", cancellationToken: cancellationToken);
             return;
         }
 
         var msgToSend = string.Join(" ", splitedText.Skip(1));
 
-        await botClient.SendTextMessageAndSplitIfOverfullAsync(chatIdToSend, msgToSend);
-        await botClient.SendTextMessageAsync(chatId, $"Сообщение было отправлено в группу {chat.Name}");
+        await botClient.SendTextMessageAndSplitIfOverfullAsync(chatIdToSend, msgToSend, cancellationToken: cancellationToken);
+        await botClient.SendTextMessageAsync(chatId, $"Сообщение было отправлено в группу {chat.Name}", cancellationToken: cancellationToken);
 
         Task SendDefaultMessage() {
-            return botClient.SendTextMessageAsync(chatId, "Синтаксис для отправки сообщения в чат: /sendchatbyid [chat id tg] [текст сообщения]");
+            return botClient.SendTextMessageAsync(chatId, "Синтаксис для отправки сообщения в чат: /sendchatbyid [chat id tg] [текст сообщения]", cancellationToken: cancellationToken);
         }
     }
 }

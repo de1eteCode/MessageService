@@ -1,5 +1,7 @@
-﻿using Application.Common.Interfaces;
-using Microsoft.EntityFrameworkCore;
+﻿using Application.Roles.Queries.GetRoles;
+using Application.Users.Commands.UpdateUser;
+using Application.Users.Queries.GetUser;
+using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
@@ -9,17 +11,15 @@ namespace TelegramService.Commands;
 /// Команда изменения пользователя
 /// </summary>
 internal class ChangeUserCommand : BotCommandAction {
-    private readonly IDataContext _context;
+    private readonly IMediator _mediator;
 
-    public ChangeUserCommand(IDataContext context) : base("changeuser", "Изменение пользователя") {
-        _context = context;
+    public ChangeUserCommand(IMediator mediator) : base("changeuser", "Изменение пользователя") {
+        _mediator = mediator;
     }
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
         var privateChatId = message.Chat!.Id;
         var msgText = message.Text!;
-
-        var roles = await _context.Roles.ToListAsync();
 
         if (string.IsNullOrWhiteSpace(msgText)) {
             await SendDefaultMessage();
@@ -35,44 +35,54 @@ internal class ChangeUserCommand : BotCommandAction {
 
         var idTelegramStr = splitedText.First();
 
+        if (long.TryParse(idTelegramStr, out long idTelegram) == false) {
+            await botClient.SendTextMessageAsync(privateChatId, $"{idTelegramStr} не похож на идентификатор пользователя Telegram", cancellationToken: cancellationToken);
+            return;
+        }
+
         // проверка на наличие такого пользователя
-        var userForChange = await _context.Users.FirstOrDefaultAsync(e => e.TelegramId!.Equals(idTelegramStr));
+        var userForChange = await _mediator.Send(new GetUserCommand() { TelegramId = idTelegram }, cancellationToken);
 
         if (userForChange == null) {
-            await botClient.SendTextMessageAsync(privateChatId, $"Пользователь {idTelegramStr} не найден");
+            await botClient.SendTextMessageAsync(privateChatId, $"Пользователь {idTelegram} не найден", cancellationToken: cancellationToken);
             return;
         }
 
         var roleId = splitedText.Last();
 
-        if (int.TryParse(roleId, out int roleIdNum)) {
-            var selectedRoleUser = roles.FirstOrDefault(e => e.AlternativeId == roleIdNum);
-
-            if (selectedRoleUser == null) {
-                await botClient.SendTextMessageAsync(privateChatId, "Я не нашел роль под id " + roleIdNum);
-                return;
-            }
-
-            userForChange.Role = selectedRoleUser;
-            userForChange.RoleUID = selectedRoleUser.UID;
-
-            _context.Entry(userForChange).State = EntityState.Modified;
-
-            await _context.SaveChangesAsync();
-
-            await botClient.SendTextMessageAsync(privateChatId, $"Пользователь {userForChange.Name} был успешно изменен");
+        if (int.TryParse(roleId, out int roleIdNum) == false) {
+            await botClient.SendTextMessageAsync(privateChatId, $"Хм, я думаю {roleId} не похож на те идентификаторы, что я отправил", cancellationToken: cancellationToken);
         }
-        else {
-            await botClient.SendTextMessageAsync(privateChatId, $"Хм, я думаю {roleId} не похож на те идентификаторы, что я отправил");
+
+        var selectedRoleUser = await _mediator.Send(new GetRoleByAlternativeIdCommand() { AlternativeId = roleIdNum }, cancellationToken);
+
+        if (selectedRoleUser == null) {
+            await botClient.SendTextMessageAsync(privateChatId, "Я не нашел роль под id " + roleIdNum);
+            return;
         }
+
+        userForChange = await _mediator.Send(new UpdateUserCommand() {
+            UserUID = userForChange.UID,
+            RoleUID = selectedRoleUser.UID,
+        }, cancellationToken);
+
+        await botClient.SendTextMessageAsync(privateChatId, $"Пользователь {userForChange.Name} был успешно изменен", cancellationToken: cancellationToken);
 
         return;
 
-        Task SendDefaultMessage() {
-            return botClient.SendTextMessageAsync(privateChatId,
+        async Task SendDefaultMessage() {
+            var roles = await _mediator.Send(new GetRolesCommand(), cancellationToken);
+
+            var rolesStrCollection = roles
+                .OrderBy(e => e.AlternativeId)
+                .Select(e => string.Format("{0}. {1}", e.AlternativeId, e.Name))
+                .ToList();
+
+            await botClient.SendTextMessageAsync(privateChatId,
                 "Синтаксис изменения пользователя: /changeuser [tg user id] [id роли]\n" +
                 "Доступные роли:\n" +
-                String.Join("\n", roles.Select(e => String.Join(" - ", e.AlternativeId, e.Name))));
+                String.Join("\n", rolesStrCollection),
+                cancellationToken: cancellationToken);
         }
     }
 }

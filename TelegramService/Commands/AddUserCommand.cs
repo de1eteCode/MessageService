@@ -41,6 +41,7 @@ internal class AddUserCommand : BotCommandAction {
         }
 
         var idTelegramStr = splitedText[(int)PositionArgs.TelegramId];
+
         if (long.TryParse(idTelegramStr, out long idTelegram) == false) {
             await botClient.SendTextMessageAsync(chatId, $"{idTelegramStr} не похож на идентификатор пользователя Telegram");
             return;
