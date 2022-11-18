@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <Folder Include="Groups\Commands\UpdateGroup\" />
-    <Folder Include="Groups\Queries\" />
     <Folder Include="Roles\Commands\" />
   </ItemGroup>
 

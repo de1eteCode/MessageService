@@ -1,0 +1,42 @@
+﻿using Application.Common.Exceptions;
+using Application.Common.Interfaces;
+using Domain.Models;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+
+namespace Application.ChatGroups.Commands.CreateChatGroup;
+
+public class CreateChatGroupCommandHandler : IRequestHandler<CreateChatGroupCommand, ChatGroup> {
+    private readonly IDataContext _context;
+
+    public CreateChatGroupCommandHandler(IDataContext context) {
+        _context = context;
+    }
+
+    public async Task<ChatGroup> Handle(CreateChatGroupCommand request, CancellationToken cancellationToken) {
+        var chat = await _context.Chats.SingleOrDefaultAsync(e => e.UID.Equals(request.ChatUID), cancellationToken);
+
+        if (chat == null) {
+            throw new NotFoundException(nameof(Chat), request.ChatUID);
+        }
+
+        var group = await _context.Groups.SingleOrDefaultAsync(e => e.UID.Equals(request.GroupUID), cancellationToken);
+
+        if (group == null) {
+            throw new NotFoundException(nameof(Group), request.GroupUID);
+        }
+
+        var chatGroup = new ChatGroup() {
+            ChatUID = chat.UID,
+            Chat = chat,
+            Group = group,
+            GroupUID = group.UID
+        };
+
+        await _context.ChatGroups.AddAsync(chatGroup, cancellationToken);
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return chatGroup;
+    }
+}

@@ -1,5 +1,8 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Chats.Queries.GetChat;
+using Application.Common.Interfaces;
+using Application.Groups.Queries.GetGroup;
 using Domain.Models;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -13,8 +16,10 @@ namespace TelegramService.Commands;
 [UserRole("Системный администратор")]
 internal class AddChatToGroupCommand : BotCommandAction {
     private readonly IDataContext _context;
+    private readonly IMediator _mediator;
 
-    public AddChatToGroupCommand(IDataContext context) : base("addchattogroup", "Добавление чата в группу") {
+    public AddChatToGroupCommand(IMediator mediator, IDataContext context) : base("addchattogroup", "Добавление чата в группу") {
+        _mediator = mediator;
         _context = context;
     }
 
@@ -50,14 +55,14 @@ internal class AddChatToGroupCommand : BotCommandAction {
         }
 
         // поиск чата по идентификатору
-        var chat = await _context.Chats.FirstOrDefaultAsync(e => e.TelegramChatId == chatIdToAdd);
+        var chat = await _mediator.Send(new GetChatCommand() { TelegramChatId = chatIdToAdd });
         if (chat == null) {
             await botClient.SendTextMessageAsync(privateChatId, $"Я не знаю о чате с идентификатором {chatIdToAdd}");
             return;
         }
 
         // поиск группы по идентификатору
-        var group = await _context.Groups.FirstOrDefaultAsync(e => e.AlternativeId == groupIdToAdd);
+        var group = await _mediator.Send(new GetGroupCommand() { AlternativeId = groupIdToAdd });
         if (group == null) {
             await botClient.SendTextMessageAsync(privateChatId, $"У меня нет группы с идентификатором {groupIdToAdd}");
             return;
