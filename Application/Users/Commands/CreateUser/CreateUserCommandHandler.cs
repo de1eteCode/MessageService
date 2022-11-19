@@ -6,10 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Users.Commands.CreateUser;
 
-public class CreateUserHandler : IRequestHandler<CreateUserCommand, User> {
+public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, User> {
     private readonly IDataContext _dataContext;
 
-    public CreateUserHandler(IDataContext dataContext) {
+    public CreateUserCommandHandler(IDataContext dataContext) {
         _dataContext = dataContext;
     }
 

@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
 using System.Reflection;
 using Telegram.Bot;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using TelegramService.Models;
 
@@ -44,7 +45,7 @@ public class LimitTests {
         var bot = BuildBot(5);
         var stopwatch = new Stopwatch();
         var repeat = 5;
-        var tasks = Enumerable.Range(0, repeat).Select(async e => await bot.GetMeAsync());
+        var tasks = Enumerable.Range(0, repeat).Select(async e => await GetRandomChat_Exception(bot));
 
         stopwatch.Start();
 
@@ -52,15 +53,7 @@ public class LimitTests {
 
         stopwatch.Stop();
 
-        var first = res.FirstOrDefault();
-
-        Assert.IsNotNull(first);
-
-        foreach (var ident in res) {
-            Assert.IsNotNull(ident);
-            Assert.AreEqual(ident.Id, first.Id);
-        }
-
+        Assert.IsFalse(res.Any(e => e == false));
         Assert.IsTrue(1 >= stopwatch.Elapsed.Seconds);
     }
 
@@ -69,7 +62,7 @@ public class LimitTests {
         var bot = BuildBot(5);
         var stopwatch = new Stopwatch();
         var repeat = 15;
-        var tasks = Enumerable.Range(0, repeat).Select(async e => await bot.GetMeAsync());
+        var tasks = Enumerable.Range(0, repeat).Select(async e => await GetRandomChat_Exception(bot));
 
         stopwatch.Start();
 
@@ -77,15 +70,7 @@ public class LimitTests {
 
         stopwatch.Stop();
 
-        var first = res.FirstOrDefault();
-
-        Assert.IsNotNull(first);
-
-        foreach (var ident in res) {
-            Assert.IsNotNull(ident);
-            Assert.AreEqual(ident.Id, first.Id);
-        }
-
+        Assert.IsFalse(res.Any(e => e == false));
         Assert.IsTrue(3 <= stopwatch.Elapsed.Seconds);
     }
 
@@ -94,7 +79,7 @@ public class LimitTests {
         var bot = BuildBot(15);
         var stopwatch = new Stopwatch();
         var repeat = 15;
-        var tasks = Enumerable.Range(0, repeat).Select(async e => await bot.GetMeAsync());
+        var tasks = Enumerable.Range(0, repeat).Select(async e => await GetRandomChat_Exception(bot));
 
         stopwatch.Start();
 
@@ -102,15 +87,7 @@ public class LimitTests {
 
         stopwatch.Stop();
 
-        var first = res.FirstOrDefault();
-
-        Assert.IsNotNull(first);
-
-        foreach (var ident in res) {
-            Assert.IsNotNull(ident);
-            Assert.AreEqual(ident.Id, first.Id);
-        }
-
+        Assert.IsFalse(res.Any(e => e == false));
         Assert.IsTrue(1 <= stopwatch.Elapsed.Seconds);
     }
 
@@ -119,7 +96,7 @@ public class LimitTests {
         var bot = BuildBot(15);
         var stopwatch = new Stopwatch();
         var repeat = 60;
-        var tasks = Enumerable.Range(0, repeat).Select(async e => await bot.GetMeAsync());
+        var tasks = Enumerable.Range(0, repeat).Select(async e => await GetRandomChat_Exception(bot));
 
         stopwatch.Start();
 
@@ -127,16 +104,30 @@ public class LimitTests {
 
         stopwatch.Stop();
 
-        var first = res.FirstOrDefault();
-
-        Assert.IsNotNull(first);
-
-        foreach (var ident in res) {
-            Assert.IsNotNull(ident);
-            Assert.AreEqual(ident.Id, first.Id);
-        }
-
+        Assert.IsFalse(res.Any(e => e == false));
         Assert.IsTrue(4 <= stopwatch.Elapsed.Seconds);
+    }
+
+    private async Task<bool> GetRandomChat_Exception(TelegramBotClient bot) {
+        long chatIdRnd = LongRandom();
+        try {
+            await bot.GetChatAsync(new ChatId(chatIdRnd));
+            return true;
+        }
+        catch (ApiRequestException ex) when (ex.ErrorCode == 400) { // not found chat
+            return true;
+        }
+        catch (Exception e) {
+            return false;
+        }
+    }
+
+    private long LongRandom(long min = long.MinValue, long max = long.MaxValue) {
+        byte[] buf = new byte[8];
+        Random.Shared.NextBytes(buf);
+        long longRand = BitConverter.ToInt64(buf, 0);
+
+        return (Math.Abs(longRand % (max - min)) + min);
     }
 
     private TelegramBotClientLimit BuildBot(int limit) {
