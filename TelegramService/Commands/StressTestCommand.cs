@@ -28,6 +28,8 @@ internal class StressTestCommand : BotCommandAction {
             return;
         }
 
+        _logger.LogWarning($"Пользователь @{message.From!.Username} ({message.From!.Id}) запустил стрес-тест на {count} запросов");
+
         int complited = 0;
         var watch = new Stopwatch();
         var previousTime = TimeSpan.FromSeconds(0);

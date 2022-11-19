@@ -1,8 +1,6 @@
-﻿using System.Text;
-using Application.Common.Interfaces;
-using Application.Groups.Queries.GetGroup;
+﻿using Application.Groups.Queries.GetGroup;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
+using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramService.Attributes;
@@ -28,6 +26,8 @@ internal class GetGroupInfoCommand : BotCommandAction {
             await SendDefaultMsg();
             return;
         }
+
+        var ch = message.Chat;
 
         if (int.TryParse(msg, out int idGroup) == false) {
             await botClient.SendTextMessageAsync(chatId, $"\"{msg}\" не похож на идентификатор группы", cancellationToken: cancellationToken);

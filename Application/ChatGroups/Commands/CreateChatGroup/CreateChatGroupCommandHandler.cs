@@ -14,6 +14,12 @@ public class CreateChatGroupCommandHandler : IRequestHandler<CreateChatGroupComm
     }
 
     public async Task<ChatGroup> Handle(CreateChatGroupCommand request, CancellationToken cancellationToken) {
+        var chatGroup = await _context.ChatGroups.SingleOrDefaultAsync(e => e.GroupUID.Equals(request.GroupUID) && e.ChatUID.Equals(request.ChatUID), cancellationToken);
+
+        if (chatGroup != null) {
+            throw new ExistingEntityException(nameof(ChatGroup), chatGroup.UID);
+        }
+
         var chat = await _context.Chats.SingleOrDefaultAsync(e => e.UID.Equals(request.ChatUID), cancellationToken);
 
         if (chat == null) {
@@ -26,7 +32,7 @@ public class CreateChatGroupCommandHandler : IRequestHandler<CreateChatGroupComm
             throw new NotFoundException(nameof(Group), request.GroupUID);
         }
 
-        var chatGroup = new ChatGroup() {
+        chatGroup = new ChatGroup() {
             ChatUID = chat.UID,
             Chat = chat,
             Group = group,

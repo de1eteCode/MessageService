@@ -1,9 +1,9 @@
-﻿using Application.Chats.Queries.GetChat;
-using Application.Common.Interfaces;
+﻿using Application.ChatGroups.Commands.CreateChatGroup;
+using Application.ChatGroups.Commands.UpdateChatGroup;
+using Application.Chats.Queries.GetChat;
 using Application.Groups.Queries.GetGroup;
-using Domain.Models;
+using Application.Users.Queries.GetUser;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramService.Attributes;
@@ -15,12 +15,10 @@ namespace TelegramService.Commands;
 /// </summary>
 [UserRole("Системный администратор")]
 internal class AddChatToGroupCommand : BotCommandAction {
-    private readonly IDataContext _context;
     private readonly IMediator _mediator;
 
-    public AddChatToGroupCommand(IMediator mediator, IDataContext context) : base("addchattogroup", "Добавление чата в группу") {
+    public AddChatToGroupCommand(IMediator mediator) : base("addchattogroup", "Добавление чата в группу") {
         _mediator = mediator;
-        _context = context;
     }
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
@@ -69,7 +67,7 @@ internal class AddChatToGroupCommand : BotCommandAction {
         }
 
         // проверка пользователя на наличие в группе
-        var user = await _context.Users.FirstOrDefaultAsync(e => e.TelegramId == message.From!.Id);
+        var user = await _mediator.Send(new GetUserCommand() { TelegramId = message.From!.Id });
         if (user == null) {
             await botClient.SendTextMessageAsync(privateChatId, $"Странно, я не нашел твою учетку в своей базе данных");
             return;
@@ -81,12 +79,14 @@ internal class AddChatToGroupCommand : BotCommandAction {
         }
 
         // проверка наличия чата в группе
-        var chatToGroup = await _context.ChatGroups.FirstOrDefaultAsync(e => e.ChatUID!.Equals(chat.UID) && e.GroupUID == group.UID);
+        var chatToGroup = group.ChatGroups.FirstOrDefault(e => e.ChatUID!.Equals(chat.UID) && e.GroupUID == group.UID);
         if (chatToGroup != null) {
             // если имеется
             if (chatToGroup.IsDeleted) {
-                chatToGroup.IsDeleted = false;
-                _context.Entry(chatToGroup).State = EntityState.Modified;
+                chatToGroup = await _mediator.Send(new UpdateChatGroupCommand() {
+                    ChatGroupUID = chat.UID,
+                    IsDeleted = false
+                });
             }
             else {
                 await botClient.SendTextMessageAsync(privateChatId, $"Чат \"{chat.Name}\" уже состоит в группе \"{group.Name}\"");
@@ -94,18 +94,13 @@ internal class AddChatToGroupCommand : BotCommandAction {
             }
         }
         else {
-            chatToGroup = new ChatGroup() {
-                Chat = chat,
+            chatToGroup = await _mediator.Send(new CreateChatGroupCommand() {
                 ChatUID = chat.UID,
-                Group = group,
                 GroupUID = group.UID,
                 IsDeleted = false
-            };
-
-            _context.Entry(chatToGroup).State = EntityState.Added;
+            });
         }
 
-        await _context.SaveChangesAsync();
         await botClient.SendTextMessageAsync(privateChatId, $"Чат \"{chat.Name}\" успешно добавлен в группу \"{group.Name}\"");
 
         return;

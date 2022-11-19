@@ -21,14 +21,14 @@ internal class LeaveChatByIdCommand : BotCommandAction {
         var msg = message.Text!;
 
         if (string.IsNullOrEmpty(msg)) {
-            await botClient.SendTextMessageAsync(message.Chat.Id, "Вы не отправили мне id чата, из которого я должен выйти");
+            await botClient.SendTextMessageAsync(message.Chat.Id, "Вы не отправили мне id чата, из которого я должен выйти", cancellationToken: cancellationToken);
             return;
         }
 
         if (long.TryParse(msg, out long id)) {
             try {
                 var chatId = new ChatId(id);
-                var chatInfo = await botClient.GetChatAsync(chatId).WaitAsync(new TimeSpan(hours: 0, minutes: 0, seconds: 10));
+                var chatInfo = await botClient.GetChatAsync(chatId).WaitAsync(new TimeSpan(hours: 0, minutes: 0, seconds: 10), cancellationToken);
 
                 var iamIsMember = await botClient.GetChatMemberAsync(chatInfo.Id, (await _whoIam.GetMeAsync()).Id) != null; // Генерирует ошибку с ErrCode = 403
 

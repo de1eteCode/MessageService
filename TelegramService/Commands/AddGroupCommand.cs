@@ -1,9 +1,6 @@
-﻿using Application.Common.Interfaces;
-using Application.Groups.Commands.CreateGroup;
+﻿using Application.Groups.Commands.CreateGroup;
 using Application.Users.Queries.GetUser;
-using Domain.Models;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramService.Attributes;

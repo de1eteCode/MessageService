@@ -1,5 +1,5 @@
-﻿using Application.Common.Interfaces;
-using Microsoft.EntityFrameworkCore;
+﻿using Application.Chats.Queries.GetChat;
+using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramService.Attributes;
@@ -11,10 +11,10 @@ namespace TelegramService.Commands;
 /// </summary>
 [UserRole("Системный администратор")]
 internal class SendAllChatMessageCommand : BotCommandAction {
-    private readonly IDataContext _context;
+    private readonly IMediator _mediator;
 
-    public SendAllChatMessageCommand(IDataContext context) : base("sendallchat", "Отправка сообщения во все чаты") {
-        _context = context;
+    public SendAllChatMessageCommand(IMediator mediator) : base("sendallchat", "Отправка сообщения во все чаты") {
+        _mediator = mediator;
     }
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
@@ -25,18 +25,18 @@ internal class SendAllChatMessageCommand : BotCommandAction {
             return;
         }
 
-        var chats = _context.Chats.Where(e => e.IsJoined).Select(e => e.TelegramChatId);
+        var chats = await _mediator.Send(new GetChatsCommand());
 
         var chatSended = 0;
 
-        if (chats.Any()) {
-            await chats.ForEachAsync(id => {
-                var msg = botClient.SendTextMessageAsync(id!, msgToSend!);
-                if (msg != null) {
-                    Interlocked.Increment(ref chatSended);
-                }
-            });
-        }
+        var tasksToSend = chats.Where(e => e.IsJoined).Select(e => Task.Run(async () => {
+            var msg = await botClient.SendTextMessageAsync(e.TelegramChatId, msgToSend!);
+            if (msg != null) {
+                Interlocked.Increment(ref chatSended);
+            }
+        }));
+
+        await Task.WhenAll(tasksToSend);
 
         await botClient.SendTextMessageAsync(message.Chat.Id, $"Сообщение отправлено в {chatSended} чатов");
     }

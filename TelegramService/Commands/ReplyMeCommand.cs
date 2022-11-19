@@ -19,6 +19,6 @@ internal class ReplyMeCommand : BotCommandAction {
             msg = "Вы ничего не отправили :с";
         }
 
-        await botClient.SendTextMessageAsync(message.Chat.Id, msg);
+        await botClient.SendTextMessageAsync(message.Chat.Id, msg, cancellationToken: cancellationToken);
     }
 }

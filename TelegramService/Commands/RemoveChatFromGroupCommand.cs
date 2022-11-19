@@ -1,5 +1,9 @@
-﻿using Application.Common.Interfaces;
-using Microsoft.EntityFrameworkCore;
+﻿using Application.ChatGroups.Commands.UpdateChatGroup;
+using Application.ChatGroups.Queries.GetChatGroup;
+using Application.Chats.Queries.GetChat;
+using Application.Groups.Queries.GetGroup;
+using Application.Users.Queries.GetUser;
+using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramService.Attributes;
@@ -11,10 +15,10 @@ namespace TelegramService.Commands;
 /// </summary>
 [UserRole("Системный администратор")]
 internal class RemoveChatFromGroupCommand : BotCommandAction {
-    private readonly IDataContext _context;
+    private readonly IMediator _mediator;
 
-    public RemoveChatFromGroupCommand(IDataContext context) : base("removechatfromgroup", "Удаление чата из группы") {
-        _context = context;
+    public RemoveChatFromGroupCommand(IMediator mediator) : base("removechatfromgroup", "Удаление чата из группы") {
+        _mediator = mediator;
     }
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
@@ -43,21 +47,21 @@ internal class RemoveChatFromGroupCommand : BotCommandAction {
         }
 
         // поиск чата по идентификатору
-        var chat = await _context.Chats.FirstOrDefaultAsync(e => e.TelegramChatId == chatIdToRemove);
+        var chat = await _mediator.Send(new GetChatCommand() { TelegramChatId = chatIdToRemove });
         if (chat == null) {
             await botClient.SendTextMessageAsync(privateChatId, $"Я не знаю о чате с идентификатором {chatIdToRemove}");
             return;
         }
 
         // поиск группы по идентификатору
-        var group = await _context.Groups.FirstOrDefaultAsync(e => e.AlternativeId == groupIdToRemove);
+        var group = await _mediator.Send(new GetGroupCommand() { AlternativeId = groupIdToRemove });
         if (group == null) {
             await botClient.SendTextMessageAsync(privateChatId, $"У меня нет группы с идентификатором {groupIdToRemove}");
             return;
         }
 
         // проверка пользователя на наличие в группе
-        var user = await _context.Users.FirstOrDefaultAsync(e => e.TelegramId == message.From!.Id);
+        var user = await _mediator.Send(new GetUserCommand() { TelegramId = message.From!.Id });
         if (user == null) {
             await botClient.SendTextMessageAsync(privateChatId, $"Странно, я не нашел твою учетку в своей базе данных");
             return;
@@ -69,16 +73,13 @@ internal class RemoveChatFromGroupCommand : BotCommandAction {
         }
 
         // проверка наличия чата в группе
-        var chatToGroup = await _context.ChatGroups.FirstOrDefaultAsync(e => e.Chat.TelegramChatId!.Equals(chat.TelegramChatId) && e.GroupUID == group.UID && e.IsDeleted == false);
-        if (chatToGroup == null) {
+        var chatToGroup = await _mediator.Send(new GetChatGroupCommand() { ChatUID = chat.UID, GroupUID = group.UID });
+        if (chatToGroup == null || chatToGroup.IsDeleted) {
             await botClient.SendTextMessageAsync(privateChatId, $"Чат \"{chat.Name}\" не состоит в группе \"{group.Name}\"");
             return;
         }
 
-        chatToGroup.IsDeleted = true;
-        // пометка "удален"
-        _context.Entry(chatToGroup).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+        chatToGroup = await _mediator.Send(new UpdateChatGroupCommand() { ChatGroupUID = chatToGroup.UID, IsDeleted = true });
 
         await botClient.SendTextMessageAsync(privateChatId, $"Чат \"{chat.Name}\" успешно удален из группы \"{group.Name}\"");
 

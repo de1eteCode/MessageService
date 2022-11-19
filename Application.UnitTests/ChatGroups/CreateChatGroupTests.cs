@@ -36,7 +36,8 @@ public class CreateChatGroupTests {
         var handler = new CreateChatGroupCommandHandler(_context);
         var request = new CreateChatGroupCommand() {
             GroupUID = Guid.NewGuid(),
-            ChatUID = Guid.NewGuid()
+            ChatUID = Guid.NewGuid(),
+            IsDeleted = false
         };
 
         Assert.ThrowsAsync<NotFoundException>(async () =>
@@ -44,11 +45,12 @@ public class CreateChatGroupTests {
     }
 
     [Test]
-    public async Task CreateChatGroupCommandHandle_Found() {
+    public async Task CreateChatGroupCommandHandle_Normal() {
         var handler = new CreateChatGroupCommandHandler(_context);
         var request = new CreateChatGroupCommand() {
             GroupUID = Guid.Parse("83c91f3b-f96a-4f0b-959d-c629d54587dc"),
-            ChatUID = Guid.Parse("481c0465-21f2-48b6-8d14-cceaa7e8e786")
+            ChatUID = Guid.Parse("481c0465-21f2-48b6-8d14-cceaa7e8e786"),
+            IsDeleted = false
         };
 
         var chatGroup = await handler.Handle(request, _cancellationTokenSource.Token);
@@ -56,7 +58,21 @@ public class CreateChatGroupTests {
         Assert.NotNull(chatGroup);
         Assert.That(chatGroup.ChatUID, Is.EqualTo(Guid.Parse("481c0465-21f2-48b6-8d14-cceaa7e8e786")));
         Assert.That(chatGroup.GroupUID, Is.EqualTo(Guid.Parse("83c91f3b-f96a-4f0b-959d-c629d54587dc")));
+        Assert.That(chatGroup.IsDeleted, Is.EqualTo(false));
         Assert.That(chatGroup.Chat.Name, Is.EqualTo("Test chat 1"));
         Assert.That(chatGroup.Group.Name, Is.EqualTo("Test group 1"));
+    }
+
+    [Test]
+    public async Task CreateChatGroupCommandHandle_Dupplicate() {
+        var handler = new CreateChatGroupCommandHandler(_context);
+        var request = new CreateChatGroupCommand() {
+            GroupUID = Guid.Parse("83c91f3b-f96a-4f0b-959d-c629d54587dc"),
+            ChatUID = Guid.Parse("481c0465-21f2-48b6-8d14-cceaa7e8e786"),
+            IsDeleted = false
+        };
+
+        var chatGroup = await handler.Handle(request, _cancellationTokenSource.Token);
+        Assert.ThrowsAsync<ExistingEntityException>(async () => await handler.Handle(request, _cancellationTokenSource.Token));
     }
 }

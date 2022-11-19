@@ -1,5 +1,7 @@
-﻿using Application.Common.Interfaces;
-using Microsoft.EntityFrameworkCore;
+﻿using Application.Groups.Queries.GetGroup;
+using Application.UserGroups.Commands.CreateUserGroup;
+using Application.Users.Queries.GetUser;
+using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramService.Attributes;
@@ -11,10 +13,10 @@ namespace TelegramService.Commands;
 /// </summary>
 [UserRole("Системный администратор")]
 internal class AddUserToGroupCommand : BotCommandAction {
-    private readonly IDataContext _context;
+    private readonly IMediator _mediator;
 
-    public AddUserToGroupCommand(IDataContext context) : base("addusertogroup", "Добавление пользователя в группу") {
-        _context = context;
+    public AddUserToGroupCommand(IMediator mediator) : base("addusertogroup", "Добавление пользователя в группу") {
+        _mediator = mediator;
     }
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
@@ -35,7 +37,7 @@ internal class AddUserToGroupCommand : BotCommandAction {
         }
 
         var groupAltIdToAddStr = splitedText.First();
-        if (long.TryParse(groupAltIdToAddStr, out long groupAltIdToAdd) == false) {
+        if (int.TryParse(groupAltIdToAddStr, out int groupAltIdToAdd) == false) {
             await botClient.SendTextMessageAsync(chatId, $"{groupAltIdToAddStr} не похож на идентификатор группы");
             return;
         }
@@ -47,35 +49,31 @@ internal class AddUserToGroupCommand : BotCommandAction {
         }
 
         // поиск данных в бд
-        var group = await _context.Groups.SingleOrDefaultAsync(e => e.AlternativeId.Equals(groupAltIdToAdd));
+        var group = await _mediator.Send(new GetGroupCommand() { AlternativeId = groupAltIdToAdd });
         if (group == null) {
             await botClient.SendTextMessageAsync(chatId, $"Группа с идентификатором {groupAltIdToAdd} не найдена");
             return;
         }
 
-        var user = await _context.Users.SingleOrDefaultAsync(e => e.TelegramId.Equals(userTgId));
+        var user = await _mediator.Send(new GetUserCommand() { TelegramId = userTgId });
         if (user == null) {
             await botClient.SendTextMessageAsync(chatId, $"Пользователь с идентификатором {userTgId} не найден");
             return;
         }
 
-        var userToGroup = await _context.UserGroups.SingleOrDefaultAsync(e => e.UserUID.Equals(user.UID) && e.GroupUID.Equals(group.UID));
-        if (userToGroup == null) {
-            // добавление
-            userToGroup = new Domain.Models.UserGroup() {
-                Group = group,
-                User = user
-            };
-
-            _context.Entry(userToGroup).State = EntityState.Added;
-            await _context.SaveChangesAsync();
-
-            await botClient.SendTextMessageAsync(chatId, $"Пользователь {user.Name} добавлен в группу {group.Name}");
-        }
-        else {
+        if (group.UserGroups.Any(e => e.UserUID.Equals(user.UID))) {
             // уже имеется
             await botClient.SendTextMessageAsync(chatId, $"Пользователь {user.Name} уже состоит в группе {group.Name}");
+            return;
         }
+
+        // добавление
+        var userToGroup = await _mediator.Send(new CreateUserGroupCommand() {
+            GroupUID = group.UID,
+            UserUID = user.UID
+        });
+
+        await botClient.SendTextMessageAsync(chatId, $"Пользователь {user.Name} добавлен в группу {group.Name}");
     }
 
     private Task SendDefaultMessage(ITelegramBotClient botClient, long chatId) {

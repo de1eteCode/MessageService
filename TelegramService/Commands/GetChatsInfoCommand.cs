@@ -1,5 +1,5 @@
-﻿using Application.Common.Interfaces;
-using Microsoft.EntityFrameworkCore;
+﻿using Application.Chats.Queries.GetChat;
+using MediatR;
 using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -14,14 +14,14 @@ namespace TelegramService.Commands;
 /// </summary>
 [UserRole("Системный администратор")]
 internal class GetChatsInfoCommand : BotCommandAction {
-    private readonly IDataContext _context;
+    private readonly IMediator _mediator;
 
-    public GetChatsInfoCommand(IDataContext context) : base("getchatsinfo", "Получение информации о всех чатах, которые есть в БД") {
-        _context = context;
+    public GetChatsInfoCommand(IMediator mediator) : base("getchatsinfo", "Получение информации о всех чатах, которые есть в БД") {
+        _mediator = mediator;
     }
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
-        IQueryable<Domain.Models.Chat> allChats = _context.Chats;
+        var allChats = await _mediator.Send(new GetChatsCommand());
 
         var msg = message.Text!;
         if (string.IsNullOrEmpty(msg)) {
@@ -42,7 +42,7 @@ internal class GetChatsInfoCommand : BotCommandAction {
 
         var stringBuilder = new StringBuilder();
 
-        var tasks = (await allChats.ToListAsync()).Select(chatModel => BuildBlockInfoChat(chatModel, botClient));
+        var tasks = allChats.Select(chatModel => BuildBlockInfoChat(chatModel, botClient));
 
         Task.WaitAll(tasks.ToArray());
 

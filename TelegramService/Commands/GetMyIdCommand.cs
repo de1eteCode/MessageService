@@ -9,6 +9,6 @@ internal class GetMyIdCommand : BotCommandAction {
     }
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
-        await botClient.SendTextMessageAsync(message.Chat.Id, $"Ваш идентификатор: " + message.From!.Id);
+        await botClient.SendTextMessageAsync(message.Chat.Id, $"Ваш идентификатор: " + message.From!.Id, cancellationToken: cancellationToken);
     }
 }

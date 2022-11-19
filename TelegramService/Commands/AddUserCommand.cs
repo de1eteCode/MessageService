@@ -1,9 +1,7 @@
-﻿using Application.Common.Interfaces;
-using Application.Roles.Queries.GetRoles;
+﻿using Application.Roles.Queries.GetRoles;
 using Application.Users.Commands.CreateUser;
 using Application.Users.Queries.GetUser;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramService.Attributes;
