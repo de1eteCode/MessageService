@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <Folder Include="Common\Attributes\" />
-    <Folder Include="Common\Enums\" />
   </ItemGroup>
 
 </Project>

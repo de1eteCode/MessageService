@@ -9,3 +9,9 @@ internal interface ITelegramRequest<out TResponce> : IRequest<TResponce> {
 
 internal interface ITelegramRequest : ITelegramRequest<Unit> {
 }
+
+internal interface ITelegramPassiveRequest<out TResponce> : IRequest<TResponce> {
+}
+
+internal interface ITelegramPassiveRequest : ITelegramPassiveRequest<Unit> {
+}
