@@ -1,6 +1,8 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Reflection.Emit;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using MediatR;
+using MessageService.TelegramService.Commands;
 using MessageService.TelegramService.Common.Enums;
 using MessageService.TelegramService.Common.Extends;
 using MessageService.TelegramService.Common.Interfaces;
@@ -15,13 +17,11 @@ internal class MessageHandler : ITelegramUpdateHandler<Message> {
     private static CommandHelper _commandHelper = new();
     private readonly IServiceProvider _serviceProvider;
     private readonly IMediator _mediator;
-    private readonly BotClient _botClient;
     private readonly ILogger<MessageHandler> _logger;
 
-    public MessageHandler(IServiceProvider serviceProvider, IMediator mediator, BotClient botClient, ILogger<MessageHandler> logger) {
+    public MessageHandler(IServiceProvider serviceProvider, IMediator mediator, ILogger<MessageHandler> logger) {
         _serviceProvider = serviceProvider;
         _mediator = mediator;
-        _botClient = botClient;
         _logger = logger;
     }
 
@@ -58,15 +58,25 @@ internal class MessageHandler : ITelegramUpdateHandler<Message> {
 
         var allowCommands = (IEnumerable<ITelegramRequest>)_serviceProvider.GetServices(typeof(ITelegramRequest));
 
-        var cmd = allowCommands.FirstOrDefault(e => e.BotCommand.Command.Equals(command.Command));
+        var request = allowCommands.FirstOrDefault(e => e.BotCommand.Command.Equals(command.Command));
 
-        if (cmd == null) {
+        if (request == null) {
             return Task.CompletedTask;
         }
 
-        _logger.LogWarning($"Todo: call command \"{command.Command}\"");
+        var typeBuilder = typeof(ITelegramRequestParamsBuilder<>).MakeGenericType(request.GetType());
 
-        return Task.CompletedTask;
+        var paramsBuilder = _serviceProvider.GetService(typeBuilder); /// <see cref="ITelegramRequestParamsBaseBuilder<>"/>
+
+        if (paramsBuilder == null || paramsBuilder.GetType().IsAbstract) {
+            throw new Exception($"Not found pasrams builder for {request.GetType().Name}");
+        }
+
+        var fillParamsMth = paramsBuilder.GetType().GetMethod("BuildParams") ?? throw new Exception();
+
+        fillParamsMth.Invoke(paramsBuilder, new object[] { new Telegram.BotAPI.GettingUpdates.Update() { Message = handleUpdate }, command.Args, request });
+
+        return _mediator.Send(request);
     }
 
     private Task HandleGroupChat(Message handleUpdate, CancellationToken cancellationToken) {
@@ -118,6 +128,8 @@ internal class MessageHandler : ITelegramUpdateHandler<Message> {
         public string Command { get; }
         public string Params { get; }
         public bool Success { get; }
+
+        public IEnumerable<string> Args => Params.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
         public CommandMatch(string command, string @params, bool success) {
             Command = command;

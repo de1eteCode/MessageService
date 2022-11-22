@@ -4,11 +4,11 @@ using Telegram.BotAPI;
 
 namespace MessageService.TelegramService.Common.Abstracts;
 
-internal abstract class TelegramRequestHandler<TRequest> : IRequestHandler<TRequest>
-    where TRequest : ITelegramRequest {
+internal abstract class TelegramPassiveRequestHandler<TRequest> : IRequestHandler<TRequest>
+    where TRequest : ITelegramPassiveRequest {
     protected readonly BotClient _botClient;
 
-    protected TelegramRequestHandler(BotClient botClient) {
+    protected TelegramPassiveRequestHandler(BotClient botClient) {
         _botClient = botClient;
     }
 

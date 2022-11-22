@@ -24,9 +24,24 @@ public static class ConfigureServices {
         services.AddHandler<ChatMemberUpdated, ChatMemberUpdatedHandler>();
 
         // telegram commands
-        services.AddCommand<ReplyMeCommand>();
+        services.AddCommand<AddChatToGroupCommand, AddChatToGroupCommandParamsBuilder>();
+        services.AddCommand<AddGroupCommand, AddGroupCommandParamsBuilder>();
+        services.AddCommand<AddUserCommand, AddUserCommandParamsBuilder>();
+        services.AddCommand<AddUserToGroupCommand, AddUserToGroupCommandParamsBuilder>();
+        services.AddCommand<ChangeUserCommand, ChangeUserCommandParamsBuilder>();
+        services.AddCommand<GetChatsInfoCommand, GetChatsInfoCommandParamsBuilder>();
+        services.AddCommand<GetGroupInfoCommand, GetGroupInfoCommandParamsBuilder>();
+        services.AddCommand<GetGroupsInfoCommand, GetGroupsInfoCommandParamsBuilder>();
+        services.AddCommand<GetMyIdCommand, GetMyIdCommandParamsBuilder>();
+        services.AddCommand<LeaveChatByIdCommand, LeaveChatByIdCommandParamsBuilder>();
+        services.AddCommand<RemoveChatFromGroupCommand, RemoveChatFromGroupCommandParamsBuilder>();
+        services.AddCommand<ReplyMeCommand, ReplyMeCommandParamsBuilder>();
+        services.AddCommand<SendAllChatByGroupCommand, SendAllChatByGroupCommandParamsBuilder>();
+        services.AddCommand<SendAllChatMessageCommand, SendAllChatMessageCommandParamsBuilder>();
+        services.AddCommand<SendChatByIdCommand, SendChatByIdCommandParamsBuilder>();
 
-        services.AddPassiveCommand<ForgetChatCommand>();
+        services.AddPassiveCommand<ForgetChatCommand, ForgetChatCommandParamsBuilder>();
+        services.AddPassiveCommand<RememberChatCommand, RememberChatCommandParamsBuilder>();
 
         services.AddSingleton(services => {
             var config = services.GetRequiredService<IOptionsMonitor<TelegramBotSettings>>().CurrentValue;
@@ -38,15 +53,31 @@ public static class ConfigureServices {
         return services;
     }
 
-    private static IServiceCollection AddCommand<TCommand>(this IServiceCollection services)
-        where TCommand : class, ITelegramRequest {
-        return services.AddTransient<ITelegramRequest, TCommand>();
-    }
+    /// <summary>
+    /// Добавление команд для пользователей
+    /// </summary>
+    /// <typeparam name="TCommand">Тип команды</typeparam>
+    /// <typeparam name="TParamsBuilder">Тип конструктора параметров команды</typeparam>
+    /// <param name="services">Коллекция сервисов</param>
+    /// <returns><paramref name="services"/></returns>
+    private static IServiceCollection AddCommand<TCommand, TParamsBuilder>(this IServiceCollection services)
+        where TCommand : class, ITelegramRequest
+        where TParamsBuilder : class, ITelegramRequestParamsBuilder<TCommand> => services
+        .AddTransient<ITelegramRequest, TCommand>()
+        .AddTransient<ITelegramRequestParamsBuilder<TCommand>, TParamsBuilder>();
 
-    private static IServiceCollection AddPassiveCommand<TCommand>(this IServiceCollection services)
-        where TCommand : class, ITelegramPassiveRequest {
-        return services.AddTransient<ITelegramPassiveRequest, TCommand>();
-    }
+    /// <summary>
+    /// Добавление пассивных команд (не доступные пользователям)
+    /// </summary>
+    /// <typeparam name="TCommand">Тип пассивной команды</typeparam>
+    /// <typeparam name="TParamsBuilder">Тип конструктора параметров команды</typeparam>
+    /// <param name="services">Коллекция сервисов</param>
+    /// <returns><paramref name="services"/></returns>
+    private static IServiceCollection AddPassiveCommand<TCommand, TParamsBuilder>(this IServiceCollection services)
+        where TCommand : class, ITelegramPassiveRequest
+        where TParamsBuilder : class, ITelegramPassiveRequestParamsBuilder<TCommand> => services
+        .AddTransient<ITelegramPassiveRequest, TCommand>()
+        .AddTransient<ITelegramPassiveRequestParamsBuilder<TCommand>, TParamsBuilder>();
 
     private static IServiceCollection AddHandler<TUpdate, THandler>(this IServiceCollection services)
         where THandler : class, ITelegramUpdateHandler<TUpdate> {

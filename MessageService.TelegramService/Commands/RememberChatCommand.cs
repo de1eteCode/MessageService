@@ -11,19 +11,19 @@ using Telegram.BotAPI.GettingUpdates;
 
 namespace MessageService.TelegramService.Commands;
 
-internal record ForgetChatCommand : ITelegramPassiveRequest {
+internal record RememberChatCommand : ITelegramPassiveRequest {
     public BotCommand BotCommand => new BotCommand("forgetchat", "Запоминание чата ботом");
     public ChatMemberUpdated ChatMemberUpdate { get; set; } = default!;
 }
 
-internal class ForgetChatCommandHandler : TelegramPassiveRequestHandler<ForgetChatCommand> {
+internal class RememberChatCommandHandler : TelegramPassiveRequestHandler<RememberChatCommand> {
     private readonly IMediator _mediator;
 
-    public ForgetChatCommandHandler(BotClient botClient, IMediator mediator) : base(botClient) {
+    public RememberChatCommandHandler(BotClient botClient, IMediator mediator) : base(botClient) {
         _mediator = mediator;
     }
 
-    public override async Task<Unit> Handle(ForgetChatCommand request, BotClient botClient, CancellationToken cancellationToken) {
+    public override async Task<Unit> Handle(RememberChatCommand request, BotClient botClient, CancellationToken cancellationToken) {
         var chat = await _mediator.Send(new GetChatCommand() { TelegramChatId = request.ChatMemberUpdate.Chat.Id });
 
         IRequest<Domain.Models.Chat> command = default!;
@@ -58,9 +58,9 @@ internal class ForgetChatCommandHandler : TelegramPassiveRequestHandler<ForgetCh
     }
 }
 
-internal class ForgetChatCommandParamsBuilder : ITelegramPassiveRequestParamsBuilder<ForgetChatCommand> {
+internal class RememberChatCommandParamsBuilder : ITelegramPassiveRequestParamsBuilder<RememberChatCommand> {
 
-    public void BuildParams(Update update, IEnumerable<string> args, ref ForgetChatCommand request) {
+    public void BuildParams(Update update, IEnumerable<string> args, ref RememberChatCommand request) {
         request.ChatMemberUpdate = update.MyChatMember!;
     }
 }
