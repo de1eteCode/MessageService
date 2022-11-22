@@ -12,8 +12,10 @@ internal record SendAllChatMessageCommand : ITelegramRequest {
 }
 
 internal class SendAllChatMessageCommandHandler : TelegramRequestHandler<SendAllChatMessageCommand> {
+    private readonly IMediator _mediator;
 
-    public SendAllChatMessageCommandHandler(BotClient botClient) : base(botClient) {
+    public SendAllChatMessageCommandHandler(BotClient botClient, IMediator mediator) : base(botClient) {
+        _mediator = mediator;
     }
 
     public override Task<Unit> Handle(SendAllChatMessageCommand request, BotClient botClient, CancellationToken cancellationToken) {

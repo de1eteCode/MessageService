@@ -12,8 +12,10 @@ internal record GetGroupInfoCommand : ITelegramRequest {
 }
 
 internal class GetGroupInfoCommandHandler : TelegramRequestHandler<GetGroupInfoCommand> {
+    private readonly IMediator _mediator;
 
-    public GetGroupInfoCommandHandler(BotClient botClient) : base(botClient) {
+    public GetGroupInfoCommandHandler(BotClient botClient, IMediator mediator) : base(botClient) {
+        _mediator = mediator;
     }
 
     public override Task<Unit> Handle(GetGroupInfoCommand request, BotClient botClient, CancellationToken cancellationToken) {

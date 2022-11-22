@@ -12,8 +12,10 @@ internal record RemoveChatFromGroupCommand : ITelegramRequest {
 }
 
 internal class RemoveChatFromGroupCommandHandler : TelegramRequestHandler<RemoveChatFromGroupCommand> {
+    private readonly IMediator _mediator;
 
-    public RemoveChatFromGroupCommandHandler(BotClient botClient) : base(botClient) {
+    public RemoveChatFromGroupCommandHandler(BotClient botClient, IMediator mediator) : base(botClient) {
+        _mediator = mediator;
     }
 
     public override Task<Unit> Handle(RemoveChatFromGroupCommand request, BotClient botClient, CancellationToken cancellationToken) {

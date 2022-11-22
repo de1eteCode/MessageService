@@ -17,7 +17,7 @@ internal record LeaveChatByIdCommand : ITelegramRequest {
     public long PrivateChatId { get; set; }
 
     /// <summary>
-    /// Идентификатор чата с пользователем, который прислал сообщение
+    /// Идентификатор чата, из которого необходимо выйти
     /// </summary>
     public long? LeaveChatId { get; set; }
 }
@@ -35,11 +35,23 @@ internal class LeaveChatByIdCommandHandler : TelegramRequestHandler<LeaveChatByI
         var botUserInfo = await botClient.GetMeAsync(cancellationToken);
 
         try {
+            var chatInfo = await botClient.GetChatAsync((long)request.LeaveChatId, cancellationToken);
+
+            var iAmIsMember = await botClient.GetChatMemberAsync((long)request.LeaveChatId, botUserInfo.Id, cancellationToken) != null; // Генерирует ошибку с ErrCode = 401 | 403
+
+            if (iAmIsMember) {
+                await botClient.LeaveChatAsync((long)request.LeaveChatId, cancellationToken);
+                await botClient.SendMessageAsync(request.PrivateChatId, $"Я вышел из чата {chatInfo.Title} ({chatInfo.Id})");
+            }
+        }
+        catch (AggregateException ex) when (ex.InnerException is BotRequestException) {
+            await HandleRequestException((ex.InnerException as BotRequestException)!, request.PrivateChatId, cancellationToken);
         }
         catch (BotRequestException ex) {
+            await HandleRequestException(ex, request.PrivateChatId, cancellationToken);
         }
 
-        throw new NotImplementedException();
+        return Unit.Value;
     }
 
     private async Task<Unit> SendDefaultMessage(long privateChatId, CancellationToken cancellationToken) {
@@ -49,6 +61,24 @@ internal class LeaveChatByIdCommandHandler : TelegramRequestHandler<LeaveChatByI
             cancellationToken: cancellationToken);
 
         return Unit.Value;
+    }
+
+    private async Task HandleRequestException(BotRequestException ex, long privateChatId, CancellationToken cancellationToken) {
+        var errorAndMessages = new Dictionary<int, string>() {
+            { 401, "Не нашел чат" },
+            { 403, "Бот не является участником этой группы" },
+        };
+
+        var msgToSend = "В ходе выполнения операции произошла ошибка: ";
+
+        if (errorAndMessages.TryGetValue(ex.ErrorCode, out var msg)) {
+            msgToSend += msg;
+        }
+        else {
+            msgToSend += ex.Message;
+        }
+
+        await _botClient.SendMessageAsync(privateChatId, msgToSend, cancellationToken: cancellationToken);
     }
 }
 
