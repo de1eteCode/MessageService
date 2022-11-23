@@ -1,4 +1,4 @@
-﻿using Application.Groups.Queries.GetGroup;
+﻿using Application.Groups.Queries;
 using MediatR;
 using System.Text;
 using Telegram.Bot;

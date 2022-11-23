@@ -1,4 +1,4 @@
-﻿using Application.Chats.Commands.CreateChat;
+﻿using Application.Chats.Commands;
 using Application.Common.Interfaces;
 
 namespace Application.Tests.Chats;

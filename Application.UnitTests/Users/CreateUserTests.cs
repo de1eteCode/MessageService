@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interfaces;
-using Application.Users.Commands.CreateUser;
+using Application.Users.Commands;
 
 namespace Application.Tests.Users;
 

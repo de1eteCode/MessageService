@@ -6,7 +6,7 @@ using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
 
 namespace MessageService.TelegramService.Commands;
-
+// TODO:
 internal record GetGroupInfoCommand : ITelegramRequest {
     public BotCommand BotCommand => new BotCommand("getgroupinfo", "Получение информации о конкретной группе");
 }

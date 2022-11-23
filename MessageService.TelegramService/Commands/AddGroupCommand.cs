@@ -1,5 +1,5 @@
-﻿using Application.Groups.Commands.CreateGroup;
-using Application.Users.Queries.GetUser;
+﻿using Application.Groups.Commands;
+using Application.Users.Queries;
 using MediatR;
 using MessageService.TelegramService.Common.Abstracts;
 using MessageService.TelegramService.Common.Interfaces;

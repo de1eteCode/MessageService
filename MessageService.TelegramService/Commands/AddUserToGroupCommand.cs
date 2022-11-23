@@ -1,6 +1,6 @@
-﻿using Application.Groups.Queries.GetGroup;
-using Application.UserGroups.Commands.CreateUserGroup;
-using Application.Users.Queries.GetUser;
+﻿using Application.Groups.Queries;
+using Application.UserGroups.Commands;
+using Application.Users.Queries;
 using Domain.Models;
 using MediatR;
 using MessageService.TelegramService.Common.Abstracts;

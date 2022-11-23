@@ -1,7 +1,7 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Tests;
-using Application.UserGroups.Commands.CreateUserGroup;
+using Application.UserGroups.Commands;
 using Domain.Models;
 
 namespace Application.UnitTests.UserGroups;

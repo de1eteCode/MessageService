@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interfaces;
-using Application.Groups.Commands.CreateGroup;
+using Application.Groups.Commands;
 using Domain.Models;
 
 namespace Application.Tests.Groups;

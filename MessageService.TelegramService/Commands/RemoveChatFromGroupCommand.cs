@@ -6,7 +6,7 @@ using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
 
 namespace MessageService.TelegramService.Commands;
-
+// TODO:
 internal record RemoveChatFromGroupCommand : ITelegramRequest {
     public BotCommand BotCommand => new BotCommand("removechatfromgroup", "Удаление чата из группы");
 }

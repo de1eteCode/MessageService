@@ -1,6 +1,5 @@
-﻿using Application.Chats.Commands.CreateChat;
-using Application.Chats.Commands.UpdateChat;
-using Application.Chats.Queries.GetChat;
+﻿using Application.Chats.Commands;
+using Application.Chats.Queries;
 using Application.Common.Interfaces;
 using Domain.Models;
 using MediatR;

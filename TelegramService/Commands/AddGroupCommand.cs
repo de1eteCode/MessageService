@@ -1,5 +1,5 @@
-﻿using Application.Groups.Commands.CreateGroup;
-using Application.Users.Queries.GetUser;
+﻿using Application.Groups.Commands;
+using Application.Users.Queries;
 using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types;

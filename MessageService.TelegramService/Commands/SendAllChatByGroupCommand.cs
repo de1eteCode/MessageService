@@ -6,7 +6,7 @@ using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
 
 namespace MessageService.TelegramService.Commands;
-
+// TODO:
 internal record SendAllChatByGroupCommand : ITelegramRequest {
     public BotCommand BotCommand => new BotCommand("sendallchatbygroup", "Отправка сообщения во все чаты, которые имееются в группе");
 }

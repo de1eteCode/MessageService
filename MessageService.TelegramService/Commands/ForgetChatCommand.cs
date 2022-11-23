@@ -1,6 +1,5 @@
-﻿using Application.Chats.Commands.CreateChat;
-using Application.Chats.Commands.UpdateChat;
-using Application.Chats.Queries.GetChat;
+﻿using Application.Chats.Commands;
+using Application.Chats.Queries;
 using MediatR;
 using MessageService.TelegramService.Common.Abstracts;
 using MessageService.TelegramService.Common.Extends;

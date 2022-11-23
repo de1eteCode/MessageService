@@ -6,9 +6,9 @@ using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
 using Telegram.BotAPI.AvailableMethods;
-using Application.Roles.Queries.GetRoles;
-using Application.Users.Queries.GetUser;
-using Application.Users.Commands.UpdateUser;
+using Application.Roles.Queries;
+using Application.Users.Queries;
+using Application.Users.Commands;
 
 namespace MessageService.TelegramService.Commands;
 

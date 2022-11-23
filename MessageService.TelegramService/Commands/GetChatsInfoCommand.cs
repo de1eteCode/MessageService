@@ -6,7 +6,7 @@ using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
 
 namespace MessageService.TelegramService.Commands;
-
+// TODO:
 internal record GetChatsInfoCommand : ITelegramRequest {
     public BotCommand BotCommand => new BotCommand("getchatsinfo", "Получение информации о всех чатах, которые есть в БД");
 }

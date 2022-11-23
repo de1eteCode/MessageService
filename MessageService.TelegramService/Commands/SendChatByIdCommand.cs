@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using Application.Chats.Queries;
+using MediatR;
 using MessageService.TelegramService.Common.Abstracts;
 using MessageService.TelegramService.Common.Interfaces;
 using Telegram.BotAPI;
@@ -34,14 +35,48 @@ internal class SendChatByIdCommandHandler : TelegramRequestHandler<SendChatByIdC
         _mediator = mediator;
     }
 
-    public override Task<Unit> Handle(SendChatByIdCommand request, BotClient botClient, CancellationToken cancellationToken) {
-        throw new NotImplementedException();
+    public override async Task<Unit> Handle(SendChatByIdCommand request, BotClient botClient, CancellationToken cancellationToken) {
+        if (request.RecieveChatId == null || string.IsNullOrEmpty(request.Message)) {
+            return await SendDefaultMessage(request.PrivateChatId, cancellationToken);
+        }
+
+        var chatToSend = await _mediator.Send(new GetChatCommand() { TelegramChatId = (long)request.RecieveChatId });
+
+        if (chatToSend == null) {
+            await botClient.SendMessageAsync(request.PrivateChatId, $"Не нашел группу с идентификатором {request.RecieveChatId}", cancellationToken: cancellationToken);
+            return Unit.Value;
+        }
+
+        if (chatToSend.IsJoined == false) {
+            await botClient.SendMessageAsync(request.PrivateChatId, $"Я не состою в {chatToSend.Name} ({chatToSend.TelegramChatId})", cancellationToken: cancellationToken);
+            return Unit.Value;
+        }
+
+        var resToSend = await botClient.SendMessageAsync(chatToSend.TelegramChatId, request.Message, cancellationToken: cancellationToken);
+
+        if (resToSend != null) {
+            var titleChat = string.Empty;
+
+            if (string.IsNullOrEmpty(resToSend.Chat.Title)) {
+                titleChat = string.Join(" ", resToSend.Chat.FirstName, resToSend.Chat.LastName);
+            }
+            else {
+                titleChat = resToSend.Chat.Title;
+            }
+
+            await botClient.SendMessageAsync(request.PrivateChatId, $"Сообщение отправлено в \"{titleChat}\"", cancellationToken: cancellationToken);
+        }
+        else {
+            await botClient.SendMessageAsync(request.PrivateChatId, $"Сообщение не было доставлено ", cancellationToken: cancellationToken);
+        }
+
+        return Unit.Value;
     }
 
     private async Task<Unit> SendDefaultMessage(long privateChatId, CancellationToken cancellationToken) {
         await _botClient.SendMessageAsync(
             privateChatId,
-            "",
+            "Синтаксис для отправки сообщения в чат: /sendchatbyid [chat id tg] [текст сообщения]",
             cancellationToken: cancellationToken);
 
         return Unit.Value;

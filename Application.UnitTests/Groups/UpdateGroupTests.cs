@@ -1,6 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
-using Application.Groups.Commands.UpdateGroup;
+using Application.Groups.Commands;
 using Domain.Models;
 
 namespace Application.Tests.Groups;
