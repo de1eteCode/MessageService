@@ -8,7 +8,7 @@ using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
 
 namespace MessageService.TelegramService.Commands;
-// TODO:
+
 internal record SendAllChatMessageCommand : ITelegramRequest {
     public BotCommand BotCommand => new BotCommand("sendallchat", "Отправка сообщения во все чаты");
 
@@ -37,7 +37,42 @@ internal class SendAllChatMessageCommandHandler : TelegramRequestHandler<SendAll
 
         var chats = await _mediator.Send(new GetChatsCommand() { Predicate = chat => chat.IsJoined }, cancellationToken);
 
-        throw new NotImplementedException();
+        var countSended = 0;
+
+        var tasksToSend = chats.Select(chat => Task.Run(async () => {
+            try {
+                var res = await botClient.SendMessageAsync(chat.TelegramChatId, request.Message, cancellationToken: cancellationToken);
+
+                if (res != null) {
+                    Interlocked.Increment(ref countSended);
+                }
+            }
+            catch (Exception) {
+                // Todo: Обработка ошибки, если бота кикнули из чата, когда был оффлайн
+            }
+        }));
+
+        await Task.WhenAll(tasksToSend);
+
+        await botClient.SendMessageAsync(request.PrivateChatId, $"Сообщение было отправлено в {countSended} чат{GetRu(countSended)}", cancellationToken: cancellationToken);
+
+        return Unit.Value;
+    }
+
+    private string GetRu(int num) {
+        if (num > 10) {
+            num = num % 10;
+        }
+
+        if (num == 1) {
+            return "";
+        }
+
+        if (num > 1 && num < 5) {
+            return "а";
+        }
+
+        return "ов";
     }
 
     private async Task<Unit> SendDefaultMessage(long privateChatId, CancellationToken cancellationToken) {
