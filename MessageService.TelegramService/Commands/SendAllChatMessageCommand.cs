@@ -1,6 +1,7 @@
 ﻿using Application.Chats.Queries;
 using MediatR;
 using MessageService.TelegramService.Common.Abstracts;
+using MessageService.TelegramService.Common.Extends;
 using MessageService.TelegramService.Common.Interfaces;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
@@ -41,7 +42,7 @@ internal class SendAllChatMessageCommandHandler : TelegramRequestHandler<SendAll
 
         var tasksToSend = chats.Select(chat => Task.Run(async () => {
             try {
-                var res = await botClient.SendMessageAsync(chat.TelegramChatId, request.Message, cancellationToken: cancellationToken);
+                var res = await botClient.SendMessageAndSplitIfOverfullAsync(chat.TelegramChatId, request.Message, cancellationToken: cancellationToken);
 
                 if (res != null) {
                     Interlocked.Increment(ref countSended);
