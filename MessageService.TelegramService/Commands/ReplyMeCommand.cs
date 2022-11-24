@@ -9,8 +9,20 @@ using Telegram.BotAPI.GettingUpdates;
 namespace MessageService.TelegramService.Commands;
 internal record ReplyMeCommand : ITelegramRequest {
     public BotCommand BotCommand => new BotCommand("replyme", "Повтор вашего сообщения");
+
+    /// <summary>
+    /// Идентификатор чата с пользователем, который прислал сообщение
+    /// </summary>
     public long PrivateChatId { get; set; }
+
+    /// <summary>
+    /// Сообщение для отправки пользователю
+    /// </summary>
     public string? Message { get; set; }
+
+    /// <summary>
+    /// Отписка по умолчанию, если <see cref="Message"/> был empty или null
+    /// </summary>
     public string DefaultMessage => "Вы ничего не отправили";
 }
 

@@ -10,7 +10,15 @@ namespace MessageService.TelegramService.Commands;
 
 internal record GetMyIdCommand : ITelegramRequest {
     public BotCommand BotCommand => new BotCommand("getmyid", "Получение идентификатора вашей учетной записи Telegram");
+
+    /// <summary>
+    /// Идентификатор чата с пользователем, который прислал сообщение
+    /// </summary>
     public long PrivateChatId { get; set; }
+
+    /// <summary>
+    /// Идентификатор чата с пользователем, который прислал сообщение
+    /// </summary>
     public long SenderUserId { get; set; }
 }
 

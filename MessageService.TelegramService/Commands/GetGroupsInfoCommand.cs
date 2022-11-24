@@ -1,14 +1,28 @@
-﻿using MediatR;
+﻿using Application.Groups.Queries;
+using MediatR;
 using MessageService.TelegramService.Common.Abstracts;
+using MessageService.TelegramService.Common.Extends;
 using MessageService.TelegramService.Common.Interfaces;
+using System.Text;
 using Telegram.BotAPI;
+using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
 
 namespace MessageService.TelegramService.Commands;
-// TODO:
+
 internal record GetGroupsInfoCommand : ITelegramRequest {
     public BotCommand BotCommand => new BotCommand("getgroupsinfo", "Получение информации о всех группах, в которых состоишь");
+
+    /// <summary>
+    /// Идентификатор чата с пользователем, который прислал сообщение
+    /// </summary>
+    public long PrivateChatId { get; set; }
+
+    /// <summary>
+    /// Идентификатор пользователя ТГ
+    /// </summary>
+    public long SenderUserId { get; set; }
 }
 
 internal class GetGroupsInfoCommandHandler : TelegramRequestHandler<GetGroupsInfoCommand> {
@@ -18,14 +32,32 @@ internal class GetGroupsInfoCommandHandler : TelegramRequestHandler<GetGroupsInf
         _mediator = mediator;
     }
 
-    public override Task<Unit> Handle(GetGroupsInfoCommand request, BotClient botClient, CancellationToken cancellationToken) {
-        throw new NotImplementedException();
+    public override async Task<Unit> Handle(GetGroupsInfoCommand request, BotClient botClient, CancellationToken cancellationToken) {
+        var groups = await _mediator.Send(new GetGroupsCommand() {
+            Predicate = group => group.UserGroups.Any(e => e.User.TelegramId.Equals(request.SenderUserId))
+        });
+
+        if (groups.Any()) {
+            var sb = new StringBuilder();
+
+            foreach (var group in groups) {
+                sb.AppendLine(String.Format("{0} - {1}", group.AlternativeId, group.Name));
+            };
+
+            await botClient.SendMessageAndSplitIfOverfullAsync(request.PrivateChatId, sb.ToString(), cancellationToken: cancellationToken);
+        }
+        else {
+            await botClient.SendMessageAsync(request.PrivateChatId, "Вы не состоите ни в одной группе", cancellationToken: cancellationToken);
+        }
+
+        return Unit.Value;
     }
 }
 
 internal class GetGroupsInfoCommandParamsBuilder : ITelegramRequestParamsBuilder<GetGroupsInfoCommand> {
 
     public void BuildParams(Update update, IEnumerable<string> args, ref GetGroupsInfoCommand request) {
-        throw new NotImplementedException();
+        request.PrivateChatId = update.Message.Chat.Id;
+        request.SenderUserId = update.Message!.From!.Id;
     }
 }

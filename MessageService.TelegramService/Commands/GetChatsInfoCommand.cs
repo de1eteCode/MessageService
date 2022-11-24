@@ -19,6 +19,9 @@ internal record GetChatsInfoCommand : ITelegramRequest {
     /// </summary>
     public long PrivateChatId { get; set; }
 
+    /// <summary>
+    /// Необязательный параметр. При значении True, выводит весь список чатов, включая те, из которых выгнали бота
+    /// </summary>
     public bool All { get; set; }
 }
 
