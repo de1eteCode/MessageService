@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using MessageService.TelegramService.Common.Abstracts;
+using MessageService.TelegramService.Common.Attributes;
 using MessageService.TelegramService.Common.Interfaces;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
@@ -8,6 +9,7 @@ using Telegram.BotAPI.GettingUpdates;
 
 namespace MessageService.TelegramService.Commands;
 
+[TelegramUserRole("Системный администратор")]
 internal record LeaveChatByIdCommand : ITelegramRequest {
     public BotCommand BotCommand => new BotCommand("leavechatbyid", "Команда для выхода из чата ботом");
 

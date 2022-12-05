@@ -9,9 +9,11 @@ using Telegram.BotAPI.AvailableMethods;
 using Application.Roles.Queries;
 using Application.Users.Queries;
 using Application.Users.Commands;
+using MessageService.TelegramService.Common.Attributes;
 
 namespace MessageService.TelegramService.Commands;
 
+[TelegramUserRole("Системный администратор")]
 internal record ChangeUserCommand : ITelegramRequest {
     public BotCommand BotCommand => new BotCommand("changeuser", "Изменение пользователя");
 

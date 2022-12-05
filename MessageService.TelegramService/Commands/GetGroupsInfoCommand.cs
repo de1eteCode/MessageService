@@ -1,6 +1,7 @@
 ﻿using Application.Groups.Queries;
 using MediatR;
 using MessageService.TelegramService.Common.Abstracts;
+using MessageService.TelegramService.Common.Attributes;
 using MessageService.TelegramService.Common.Extends;
 using MessageService.TelegramService.Common.Interfaces;
 using System.Text;
@@ -11,6 +12,7 @@ using Telegram.BotAPI.GettingUpdates;
 
 namespace MessageService.TelegramService.Commands;
 
+[TelegramUserRole("Системный администратор")]
 internal record GetGroupsInfoCommand : ITelegramRequest {
     public BotCommand BotCommand => new BotCommand("getgroupsinfo", "Получение информации о всех группах, в которых состоишь");
 
@@ -40,7 +42,7 @@ internal class GetGroupsInfoCommandHandler : TelegramRequestHandler<GetGroupsInf
         if (groups.Any()) {
             var sb = new StringBuilder();
 
-            foreach (var group in groups) {
+            foreach (var group in groups.OrderBy(e => e.AlternativeId)) {
                 sb.AppendLine(String.Format("{0} - {1}", group.AlternativeId, group.Name));
             };
 

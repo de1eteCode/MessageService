@@ -2,6 +2,7 @@
 using MediatR;
 using MessageService.TelegramService;
 using MessageService.TelegramService.Commands;
+using MessageService.TelegramService.Common.AttributeValidators;
 using MessageService.TelegramService.Common.Behaviours;
 using MessageService.TelegramService.Common.Interfaces;
 using MessageService.TelegramService.Common.Models;
@@ -22,6 +23,10 @@ public static class ConfigureServices {
         // telegram handlers
         services.AddHandler<Message, MessageHandler>();
         services.AddHandler<ChatMemberUpdated, ChatMemberUpdatedHandler>();
+
+        // telegram validators
+        services.AddTelegramValidator<UserNameValidator>();
+        services.AddTelegramValidator<UserRoleValidator>();
 
         // telegram commands
         services.AddCommand<AddChatToGroupCommand, AddChatToGroupCommandParamsBuilder>();
@@ -80,7 +85,10 @@ public static class ConfigureServices {
         .AddTransient<ITelegramPassiveRequestParamsBuilder<TCommand>, TParamsBuilder>();
 
     private static IServiceCollection AddHandler<TUpdate, THandler>(this IServiceCollection services)
-        where THandler : class, ITelegramUpdateHandler<TUpdate> {
-        return services.AddTransient(typeof(ITelegramUpdateHandler<TUpdate>), typeof(THandler));
-    }
+        where THandler : class, ITelegramUpdateHandler<TUpdate> =>
+        services.AddTransient(typeof(ITelegramUpdateHandler<TUpdate>), typeof(THandler));
+
+    private static IServiceCollection AddTelegramValidator<T>(this IServiceCollection services)
+        where T : class, IValidator =>
+        services.AddTransient<IValidator, T>();
 }

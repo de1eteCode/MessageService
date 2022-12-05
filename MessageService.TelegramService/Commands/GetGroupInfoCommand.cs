@@ -2,6 +2,7 @@
 using Domain.Models;
 using MediatR;
 using MessageService.TelegramService.Common.Abstracts;
+using MessageService.TelegramService.Common.Attributes;
 using MessageService.TelegramService.Common.Interfaces;
 using System.Text;
 using Telegram.BotAPI;
@@ -11,6 +12,7 @@ using Telegram.BotAPI.GettingUpdates;
 
 namespace MessageService.TelegramService.Commands;
 
+[TelegramUserRole("Системный администратор")]
 internal record GetGroupInfoCommand : ITelegramRequest {
     public BotCommand BotCommand => new BotCommand("getgroupinfo", "Получение информации о конкретной группе");
 

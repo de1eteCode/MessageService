@@ -14,8 +14,4 @@
     <PackageReference Include="Telegram.BotAPI" Version="6.3.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Common\Attributes\" />
-  </ItemGroup>
-
 </Project>

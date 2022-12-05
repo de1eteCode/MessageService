@@ -1,6 +1,7 @@
 ﻿using Application.Chats.Queries;
 using MediatR;
 using MessageService.TelegramService.Common.Abstracts;
+using MessageService.TelegramService.Common.Attributes;
 using MessageService.TelegramService.Common.Interfaces;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
@@ -9,6 +10,7 @@ using Telegram.BotAPI.GettingUpdates;
 
 namespace MessageService.TelegramService.Commands;
 
+[TelegramUserRole("Системный администратор")]
 internal record SendChatByIdCommand : ITelegramRequest {
     public BotCommand BotCommand => new BotCommand("sendchatbyid", "Отправка сообщения во все чаты");
 

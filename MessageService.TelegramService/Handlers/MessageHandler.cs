@@ -1,15 +1,16 @@
-﻿using System.Reflection.Emit;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using MediatR;
-using MessageService.TelegramService.Commands;
+﻿using MediatR;
 using MessageService.TelegramService.Common.Enums;
 using MessageService.TelegramService.Common.Extends;
 using MessageService.TelegramService.Common.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using Telegram.BotAPI;
+using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableTypes;
+using TelegramChat = Telegram.BotAPI.AvailableTypes.Chat;
+using TelegramUser = Telegram.BotAPI.AvailableTypes.User;
 
 namespace MessageService.TelegramService.Handlers;
 
@@ -18,11 +19,40 @@ internal class MessageHandler : ITelegramUpdateHandler<Message> {
     private readonly IServiceProvider _serviceProvider;
     private readonly IMediator _mediator;
     private readonly ILogger<MessageHandler> _logger;
+    private readonly IEnumerable<IValidator> _telegramValidators;
+    private readonly BotClient _botClient;
 
-    public MessageHandler(IServiceProvider serviceProvider, IMediator mediator, ILogger<MessageHandler> logger) {
+    public MessageHandler(
+        IServiceProvider serviceProvider,
+        IMediator mediator,
+        ILogger<MessageHandler> logger,
+        IEnumerable<IValidator> telegramValidators,
+        BotClient botClient) {
         _serviceProvider = serviceProvider;
         _mediator = mediator;
         _logger = logger;
+        _telegramValidators = telegramValidators;
+        _botClient = botClient;
+    }
+
+    private async Task<bool> IsValidAndError<T>(TelegramUser user, T obj, TelegramChat tgChat)
+        where T : class, ITelegramRequest {
+        var listOfRes = new List<ValidatorResult>();
+        foreach (var validator in _telegramValidators) {
+            var curRes = await validator.IsValidAsync(user, obj);
+            listOfRes.Add(curRes);
+        }
+
+        if (listOfRes.Any(e => e == ValidatorResult.Allow)) {
+            return true;
+        }
+
+        if (listOfRes.Any(e => e == ValidatorResult.Deny)) {
+            await _botClient.SendMessageAsync(tgChat.Id, "У Вас не достаточно прав для выполнения данной операции");
+            return false;
+        }
+
+        return true;
     }
 
     public Task HandleUpdate(Message handleUpdate, UpdateType updateType, CancellationToken cancellationToken) {
@@ -64,6 +94,10 @@ internal class MessageHandler : ITelegramUpdateHandler<Message> {
             return Task.CompletedTask;
         }
 
+        if (IsValidAndError(handleUpdate.From!, request, handleUpdate.Chat!).Result == false) {
+            return Task.CompletedTask;
+        }
+
         var typeBuilder = typeof(ITelegramRequestParamsBuilder<>).MakeGenericType(request.GetType());
 
         var paramsBuilder = _serviceProvider.GetService(typeBuilder); /// <see cref="ITelegramRequestParamsBaseBuilder<>"/>
@@ -79,17 +113,11 @@ internal class MessageHandler : ITelegramUpdateHandler<Message> {
         return _mediator.Send(request);
     }
 
-    private Task HandleGroupChat(Message handleUpdate, CancellationToken cancellationToken) {
-        return Task.CompletedTask;
-    }
+    private Task HandleGroupChat(Message handleUpdate, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    private Task HandleSuperGroupChat(Message handleUpdate, CancellationToken cancellationToken) {
-        return Task.CompletedTask;
-    }
+    private Task HandleSuperGroupChat(Message handleUpdate, CancellationToken cancellationToken) => Task.CompletedTask;
 
-    private Task HandleChanelChat(Message handleUpdate, CancellationToken cancellationToken) {
-        return Task.CompletedTask;
-    }
+    private Task HandleChanelChat(Message handleUpdate, CancellationToken cancellationToken) => Task.CompletedTask;
 
     private class CommandHelper {
         private const string COMMAND = "command";
