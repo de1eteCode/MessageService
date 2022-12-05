@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MessageService.TelegramService.Commands;
 using MessageService.TelegramService.Common.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
@@ -13,12 +14,10 @@ using Telegram.BotAPI.GettingUpdates;
 namespace MessageService.TelegramService.Handlers;
 
 internal class ChatMemberUpdatedHandler : ITelegramUpdateHandler<ChatMemberUpdated> {
-    private readonly IServiceProvider _serviceProvider;
     private readonly IMediator _mediator;
     private readonly ILogger<MessageHandler> _logger;
 
-    public ChatMemberUpdatedHandler(IServiceProvider serviceProvider, IMediator mediator, ILogger<MessageHandler> logger) {
-        _serviceProvider = serviceProvider;
+    public ChatMemberUpdatedHandler(IMediator mediator, ILogger<MessageHandler> logger) {
         _mediator = mediator;
         _logger = logger;
     }
@@ -34,10 +33,12 @@ internal class ChatMemberUpdatedHandler : ITelegramUpdateHandler<ChatMemberUpdat
     }
 
     private Task HandleMyChatMemberUpdate(ChatMemberUpdated handleUpdate, CancellationToken cancellationToken) {
-        throw new NotImplementedException();
+        _logger.LogInformation("Добавление чата: " + handleUpdate.Chat.Title);
+        return _mediator.Send(new RememberChatCommand() { ChatMemberUpdate = handleUpdate });
     }
 
     private Task HandleChatMemberUpdate(ChatMemberUpdated handleUpdate, CancellationToken cancellationToken) {
-        throw new NotImplementedException();
+        _logger.LogInformation("Удаление чата: " + handleUpdate.Chat.Title);
+        return _mediator.Send(new ForgetChatCommand() { ChatMemberUpdate = handleUpdate });
     }
 }

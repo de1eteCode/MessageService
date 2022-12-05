@@ -9,6 +9,7 @@ public class DataContext : DbContext, IDataContext {
 
     public DataContext(DbContextOptions<DataContext> options)
         : base(options) {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
     }
 
     public virtual DbSet<Chat> Chats { get; set; } = null!;

@@ -4,6 +4,7 @@ using MessageService.TelegramService.Common.Abstracts;
 using MessageService.TelegramService.Common.Attributes;
 using MessageService.TelegramService.Common.Extends;
 using MessageService.TelegramService.Common.Interfaces;
+using Microsoft.Extensions.Logging;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableTypes;
@@ -28,9 +29,11 @@ internal record SendAllChatMessageCommand : ITelegramRequest {
 
 internal class SendAllChatMessageCommandHandler : TelegramRequestHandler<SendAllChatMessageCommand> {
     private readonly IMediator _mediator;
+    private readonly ILogger<SendAllChatMessageCommandHandler> _logger;
 
-    public SendAllChatMessageCommandHandler(BotClient botClient, IMediator mediator) : base(botClient) {
+    public SendAllChatMessageCommandHandler(BotClient botClient, IMediator mediator, ILogger<SendAllChatMessageCommandHandler> logger) : base(botClient) {
         _mediator = mediator;
+        _logger = logger;
     }
 
     public override async Task<Unit> Handle(SendAllChatMessageCommand request, BotClient botClient, CancellationToken cancellationToken) {
@@ -50,8 +53,9 @@ internal class SendAllChatMessageCommandHandler : TelegramRequestHandler<SendAll
                     Interlocked.Increment(ref countSended);
                 }
             }
-            catch (Exception) {
+            catch (Exception ex) {
                 // Todo: Обработка ошибки, если бота кикнули из чата, когда был оффлайн
+                _logger.LogError(ex, "Unhandled exception");
             }
         }));
 

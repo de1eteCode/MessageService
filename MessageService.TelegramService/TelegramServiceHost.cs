@@ -87,13 +87,13 @@ internal class TelegramServiceHost : IHostedService {
             _logger.LogInformation("Запрашиваем установленные комманды...");
             var currentSetCommands = await _botClient.GetMyCommandsAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 
-            var definedCommands = scope.ServiceProvider.GetServices<ITelegramRequest>().Select(e => e.BotCommand);
+            var definedCommands = scope.ServiceProvider.GetServices<ITelegramRequest>().Select(e => e.BotCommand).ToList();
 
             if (definedCommands.Count() != currentSetCommands.Count() || definedCommands.Any(e => currentSetCommands.Contains(e) == false)) {
                 _logger.LogInformation("Удаляем старые команды...");
 
                 var deleteResult = await _botClient.DeleteMyCommandsAsync(
-                    scope: new BotCommandScopeDefault(),
+                    scope: new BotCommandScopeAllPrivateChats(),
                     cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
 
@@ -108,7 +108,7 @@ internal class TelegramServiceHost : IHostedService {
 
                 var setResult = await _botClient.SetMyCommandsAsync(
                     commands: definedCommands,
-                    scope: new BotCommandScopeDefault(),
+                    scope: new BotCommandScopeAllPrivateChats(),
                     cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
 

@@ -5,6 +5,7 @@ using MessageService.TelegramService.Common.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
@@ -87,6 +88,16 @@ internal class MessageHandler : ITelegramUpdateHandler<Message> {
         }
 
         var allowCommands = (IEnumerable<ITelegramRequest>)_serviceProvider.GetServices(typeof(ITelegramRequest));
+
+        if (command.Command.Equals("getcommands")) {
+            var sb = new StringBuilder();
+            sb.AppendLine("Доступные команды");
+            foreach (var cmd in allowCommands.Select(e => e.BotCommand).OrderBy(e => e.Command)) {
+                sb.AppendLine(string.Format("- /{0} - {1}", cmd.Command, cmd.Description));
+            }
+
+            return _botClient.SendMessageAsync(handleUpdate.Chat.Id, sb.ToString());
+        }
 
         var request = allowCommands.FirstOrDefault(e => e.BotCommand.Command.Equals(command.Command));
 

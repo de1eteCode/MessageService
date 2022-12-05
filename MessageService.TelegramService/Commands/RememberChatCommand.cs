@@ -32,10 +32,7 @@ internal class RememberChatCommandHandler : TelegramPassiveRequestHandler<Rememb
             command = new CreateChatCommand() {
                 TelegramChatId = request.ChatMemberUpdate.Chat!.Id,
                 Name = request.ChatMemberUpdate.Chat!.Title!,
-                IsJoined = false,
-                KickedUserLogin = request.ChatMemberUpdate.From?.Username ?? "unknown user",
-                KickedUserId = request.ChatMemberUpdate.From?.Id ?? -1,
-                Time = DateTimeHelper.ConvertUnixToDateTime(request.ChatMemberUpdate.Date)
+                IsJoined = true
             };
         }
         else {
@@ -44,10 +41,7 @@ internal class RememberChatCommandHandler : TelegramPassiveRequestHandler<Rememb
                 UID = chat.UID,
                 TelegramChatId = request.ChatMemberUpdate.Chat!.Id,
                 Name = request.ChatMemberUpdate.Chat!.Title!,
-                IsJoined = false,
-                KickedUserLogin = request.ChatMemberUpdate.From?.Username ?? "unknown user",
-                KickedUserId = request.ChatMemberUpdate.From?.Id ?? -1,
-                Time = DateTimeHelper.ConvertUnixToDateTime(request.ChatMemberUpdate.Date)
+                IsJoined = true
             };
         }
 

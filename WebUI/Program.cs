@@ -2,8 +2,6 @@ using Application.Common.Interfaces;
 using Infrastructure.Data;
 using MessageService.TelegramService.Common.Models;
 using Microsoft.EntityFrameworkCore;
-using TelegramService;
-using TelegramService.Models;
 using WebUI.Data;
 
 namespace WebUI;

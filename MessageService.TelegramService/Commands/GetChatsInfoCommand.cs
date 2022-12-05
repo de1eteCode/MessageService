@@ -59,7 +59,7 @@ internal class GetChatsInfoCommandHandler : TelegramRequestHandler<GetChatsInfoC
 
         await botClient.SendMessageAndSplitIfOverfullAsync(request.PrivateChatId, stringBuilder.ToString(), cancellationToken: cancellationToken);
 
-        throw new NotImplementedException();
+        return Unit.Value;
     }
 
     private Task<string> BuildBlockInfoChat(Domain.Models.Chat chatModel) {
