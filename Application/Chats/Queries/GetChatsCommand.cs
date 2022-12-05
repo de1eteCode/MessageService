@@ -2,11 +2,12 @@
 using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Application.Chats.Queries;
 
 public record GetChatsCommand : IRequest<IEnumerable<Chat>> {
-    public Func<Chat, bool>? Predicate { get; set; } = null;
+    public Expression<Func<Chat, bool>>? Predicate { get; set; } = null;
 }
 
 public class GetChatsCommandHandler : IRequestHandler<GetChatsCommand, IEnumerable<Chat>> {

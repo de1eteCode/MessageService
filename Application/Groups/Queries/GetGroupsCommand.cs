@@ -2,11 +2,12 @@
 using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Application.Groups.Queries;
 
 public record GetGroupsCommand : IRequest<IEnumerable<Group>> {
-    public Func<Group, bool>? Predicate { get; set; } = null;
+    public Expression<Func<Group, bool>>? Predicate { get; set; } = null;
 }
 
 public class GetGroupsCommandHandler : IRequestHandler<GetGroupsCommand, IEnumerable<Group>> {

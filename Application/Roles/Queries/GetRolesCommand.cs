@@ -2,10 +2,11 @@
 using Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Application.Roles.Queries;
 public record GetRolesCommand : IRequest<IEnumerable<Role>> {
-    public Func<Role, bool>? Predicate { get; set; } = null;
+    public Expression<Func<Role, bool>>? Predicate { get; set; } = null;
 }
 
 public class GetRolesCommandHandler : IRequestHandler<GetRolesCommand, IEnumerable<Role>> {
