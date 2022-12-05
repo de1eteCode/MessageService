@@ -21,8 +21,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\TelegramService\TelegramService.csproj" />
-  </ItemGroup>
-
 </Project>
