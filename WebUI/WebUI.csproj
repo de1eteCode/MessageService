@@ -19,7 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
-    <ProjectReference Include="..\TelegramService\TelegramService.csproj" />
+    <ProjectReference Include="..\MessageService.TelegramService\MessageService.TelegramService.csproj" />
   </ItemGroup>
 
 </Project>

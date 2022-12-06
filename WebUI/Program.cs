@@ -1,8 +1,7 @@
 using Application.Common.Interfaces;
 using Infrastructure.Data;
+using MessageService.TelegramService.Common.Models;
 using Microsoft.EntityFrameworkCore;
-using TelegramService;
-using TelegramService.Models;
 using WebUI.Data;
 
 namespace WebUI;
@@ -13,7 +12,8 @@ public class Program {
         var builder = WebApplication.CreateBuilder(args);
 
         // Telegram settings
-        builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelegramSettings"));
+        //builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelegramSettings"));
+        builder.Services.Configure<TelegramBotSettings>(builder.Configuration.GetSection("TelegramSettings"));
 
         // Infrastructure: EF Core
         builder.Services.AddDbContext<IDataContext, DataContext>(options => {
@@ -25,8 +25,12 @@ public class Program {
 #endif
         });
 
+        // Application services
+        builder.Services.AddApplicationServices();
+
         // Handlers
-        builder.Services.AddTelegramHostedService();
+        //builder.Services.AddTelegramHostedService();
+        builder.Services.AddTelegramService();
 
         // Add services to the container.
         builder.Services.AddRazorPages();
