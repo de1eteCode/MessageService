@@ -1,5 +1,6 @@
 ﻿using Application.Chats.Queries.GetChat;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using TelegramService.Attributes;
@@ -12,9 +13,11 @@ namespace TelegramService.Commands;
 [UserRole("Системный администратор")]
 internal class SendAllChatMessageCommand : BotCommandAction {
     private readonly IMediator _mediator;
+    private readonly ILogger<SendAllChatMessageCommand> _logger;
 
-    public SendAllChatMessageCommand(IMediator mediator) : base("sendallchat", "Отправка сообщения во все чаты") {
+    public SendAllChatMessageCommand(IMediator mediator, ILogger<SendAllChatMessageCommand> logger) : base("sendallchat", "Отправка сообщения во все чаты") {
         _mediator = mediator;
+        _logger = logger;
     }
 
     public override async Task ExecuteActionAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
@@ -30,9 +33,14 @@ internal class SendAllChatMessageCommand : BotCommandAction {
         var chatSended = 0;
 
         var tasksToSend = chats.Where(e => e.IsJoined).Select(e => Task.Run(async () => {
-            var msg = await botClient.SendTextMessageAsync(e.TelegramChatId, msgToSend!);
-            if (msg != null) {
-                Interlocked.Increment(ref chatSended);
+            try {
+                var msg = await botClient.SendTextMessageAsync(e.TelegramChatId, msgToSend!);
+                if (msg != null) {
+                    Interlocked.Increment(ref chatSended);
+                }
+            }
+            catch (Exception e) {
+                _logger.LogError(e, "Error send");
             }
         }));
 
