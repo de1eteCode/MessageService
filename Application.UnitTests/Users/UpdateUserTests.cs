@@ -1,6 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Application.Tests;
-using Application.Users.Commands.UpdateUser;
+using Application.Users.Commands;
 using Domain.Models;
 
 namespace Application.UnitTests.Users;

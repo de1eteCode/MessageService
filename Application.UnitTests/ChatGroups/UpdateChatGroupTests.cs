@@ -1,4 +1,4 @@
-﻿using Application.ChatGroups.Commands.UpdateChatGroup;
+﻿using Application.ChatGroups.Commands;
 using Application.Common.Interfaces;
 using Domain.Models;
 

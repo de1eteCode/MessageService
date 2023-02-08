@@ -1,4 +1,4 @@
-﻿using Application.Chats.Queries.GetChat;
+﻿using Application.Chats.Queries;
 using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types;

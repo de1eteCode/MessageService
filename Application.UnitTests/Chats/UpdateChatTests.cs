@@ -1,4 +1,4 @@
-﻿using Application.Chats.Commands.UpdateChat;
+﻿using Application.Chats.Commands;
 using Application.Common.Interfaces;
 using Domain.Models;
 
