@@ -1,6 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Application.Groups.Commands.CreateGroup;
-using Domain.Models;
+using Domain.Entities;
 
 namespace Application.Tests.Groups;
 

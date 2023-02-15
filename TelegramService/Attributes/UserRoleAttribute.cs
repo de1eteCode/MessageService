@@ -11,7 +11,7 @@ internal class UserRoleAttribute : Attribute {
     }
 
     /// <summary>
-    /// Наименование <see cref="Domain.Models.Role"/> пользователя
+    /// Наименование <see cref="Domain.Entities.Role"/> пользователя
     /// </summary>
     public string RoleName { get; }
 }

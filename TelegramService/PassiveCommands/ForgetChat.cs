@@ -22,7 +22,7 @@ internal class ForgetChat {
     public async Task ExecuteActionAsync(ChatMemberUpdated chatMemberUpdate) {
         var mediator_chat = await _mediator.Send(new GetChatCommand() { TelegramChatId = chatMemberUpdate.Chat.Id });
 
-        IRequest<Domain.Models.Chat> command = default!;
+        IRequest<Domain.Entities.Chat> command = default!;
 
         if (mediator_chat == null) {
             // чат не существует в бд

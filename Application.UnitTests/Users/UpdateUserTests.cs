@@ -1,7 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Application.Tests;
 using Application.Users.Commands;
-using Domain.Models;
+using Domain.Entities;
 
 namespace Application.UnitTests.Users;
 

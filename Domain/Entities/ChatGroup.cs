@@ -1,4 +1,6 @@
-﻿namespace Domain.Models;
+﻿using Domain.Common;
+
+namespace Domain.Entities;
 
 /// <summary>
 /// Объединение сущностей <see cref="Chat"/> и <see cref="Group"/>

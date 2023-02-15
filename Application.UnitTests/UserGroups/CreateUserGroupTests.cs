@@ -2,7 +2,7 @@
 using Application.Common.Interfaces;
 using Application.Tests;
 using Application.UserGroups.Commands;
-using Domain.Models;
+using Domain.Entities;
 
 namespace Application.UnitTests.UserGroups;
 

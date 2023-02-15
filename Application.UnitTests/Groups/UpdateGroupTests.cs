@@ -1,7 +1,7 @@
 ﻿using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Groups.Commands.UpdateGroup;
-using Domain.Models;
+using Domain.Entities;
 
 namespace Application.Tests.Groups;
 

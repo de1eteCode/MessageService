@@ -1,7 +1,7 @@
 ﻿using Application.ChatGroups.Commands;
 using Application.Common.Exceptions;
 using Application.Common.Interfaces;
-using Domain.Models;
+using Domain.Entities;
 
 namespace Application.Tests.ChatGroups;
 

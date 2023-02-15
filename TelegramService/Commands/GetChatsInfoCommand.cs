@@ -55,7 +55,7 @@ internal class GetChatsInfoCommand : BotCommandAction {
         await botClient.SendTextMessageAndSplitIfOverfullAsync(message.Chat.Id, stringBuilder.ToString());
     }
 
-    private Task<string> BuildBlockInfoChat(Domain.Models.Chat chatModel, ITelegramBotClient botClient) {
+    private Task<string> BuildBlockInfoChat(Domain.Entities.Chat chatModel, ITelegramBotClient botClient) {
         var strBuilder = new StringBuilder();
         strBuilder.AppendLine("ID: " + chatModel.TelegramChatId);
         strBuilder.AppendLine("Имя: " + chatModel.Name);

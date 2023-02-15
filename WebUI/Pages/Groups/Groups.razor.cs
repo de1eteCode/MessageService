@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interfaces;
-using Domain.Models;
+using Domain.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 
