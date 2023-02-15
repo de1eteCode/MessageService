@@ -15,18 +15,8 @@ public class Program {
         // Telegram settings
         builder.Services.Configure<TelegramSettings>(builder.Configuration.GetSection("TelegramSettings"));
 
-        // Infrastructure: EF Core
-        builder.Services.AddDbContext<IDataContext, DataContext>(options => {
-            options.UseLazyLoadingProxies();
-            options.UseNpgsql(builder.Configuration.GetConnectionString("psql"));
-
-#if DEBUG
-            options.EnableSensitiveDataLogging();
-#endif
-        });
-
-        // Application services
         builder.Services.AddApplicationServices();
+        builder.Services.AddInfrastructureServices(builder.Configuration);
 
         // Handlers
         builder.Services.AddTelegramHostedService();

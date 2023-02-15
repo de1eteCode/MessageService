@@ -4,7 +4,6 @@ using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
-using TelegramService.Attributes;
 using TelegramService.Extensions;
 
 namespace TelegramService.Commands;
@@ -12,7 +11,6 @@ namespace TelegramService.Commands;
 /// <summary>
 /// Получение информации о всех чатах, о которых знает бот
 /// </summary>
-[UserRole("Системный администратор")]
 internal class GetChatsInfoCommand : BotCommandAction {
     private readonly IMediator _mediator;
 

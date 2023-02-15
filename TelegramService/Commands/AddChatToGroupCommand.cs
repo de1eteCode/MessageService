@@ -5,14 +5,12 @@ using Application.Users.Queries;
 using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using TelegramService.Attributes;
 
 namespace TelegramService.Commands;
 
 /// <summary>
 /// Команда добавления чата в команду
 /// </summary>
-[UserRole("Системный администратор")]
 internal class AddChatToGroupCommand : BotCommandAction {
     private readonly IMediator _mediator;
 

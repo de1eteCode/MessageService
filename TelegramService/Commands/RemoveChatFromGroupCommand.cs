@@ -6,14 +6,12 @@ using Application.Users.Queries;
 using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using TelegramService.Attributes;
 
 namespace TelegramService.Commands;
 
 /// <summary>
 /// Удаление чата из группы
 /// </summary>
-[UserRole("Системный администратор")]
 internal class RemoveChatFromGroupCommand : BotCommandAction {
     private readonly IMediator _mediator;
 

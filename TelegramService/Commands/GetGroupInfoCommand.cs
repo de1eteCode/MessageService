@@ -3,14 +3,12 @@ using MediatR;
 using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using TelegramService.Attributes;
 
 namespace TelegramService.Commands;
 
 /// <summary>
 /// Получение информации о конкретной внутренней роли
 /// </summary>
-[UserRole("Системный администратор")]
 internal class GetGroupInfoCommand : BotCommandAction {
     private readonly IMediator _mediator;
 

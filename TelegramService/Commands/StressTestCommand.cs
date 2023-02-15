@@ -2,11 +2,9 @@
 using System.Diagnostics;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using TelegramService.Attributes;
 
 namespace TelegramService.Commands;
 
-[UserRole("Системный администратор")]
 internal class StressTestCommand : BotCommandAction {
     private readonly ILogger<StressTestCommand> _logger;
 

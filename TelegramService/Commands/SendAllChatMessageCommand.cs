@@ -3,14 +3,12 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using TelegramService.Attributes;
 
 namespace TelegramService.Commands;
 
 /// <summary>
 /// Рассылка сообщений по всем чатам
 /// </summary>
-[UserRole("Системный администратор")]
 internal class SendAllChatMessageCommand : BotCommandAction {
     private readonly IMediator _mediator;
     private readonly ILogger<SendAllChatMessageCommand> _logger;

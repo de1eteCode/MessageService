@@ -1,7 +1,6 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
-using TelegramService.Attributes;
 using TelegramService.Interfaces;
 
 namespace TelegramService.Commands;
@@ -9,7 +8,6 @@ namespace TelegramService.Commands;
 /// <summary>
 /// Команда выхода бота из чата
 /// </summary>
-[UserRole("Системный администратор")]
 internal class LeaveChatByIdCommand : BotCommandAction {
     private readonly IWhoIam _whoIam;
 

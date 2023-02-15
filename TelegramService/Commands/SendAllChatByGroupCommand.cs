@@ -2,14 +2,12 @@
 using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using TelegramService.Attributes;
 
 namespace TelegramService.Commands;
 
 /// <summary>
 /// Рассылка сообщения по всем чатам, которые состоят в выбранной пользователем группой
 /// </summary>
-[UserRole("Системный администратор")]
 internal class SendAllChatByGroupCommand : BotCommandAction {
     private readonly IMediator _mediator;
 

@@ -2,7 +2,6 @@
 using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using TelegramService.Attributes;
 using TelegramService.Extensions;
 
 namespace TelegramService.Commands;
@@ -10,7 +9,6 @@ namespace TelegramService.Commands;
 /// <summary>
 /// Отправка сообщения в конкретную группу
 /// </summary>
-[UserRole("Системный администратор")]
 internal class SendChatById : BotCommandAction {
     private readonly IMediator _mediator;
 

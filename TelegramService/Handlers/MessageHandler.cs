@@ -4,7 +4,6 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TelegramService.Commands;
-using TelegramService.Enums;
 using TelegramService.Interfaces;
 
 namespace TelegramService.Handlers;
@@ -15,32 +14,10 @@ namespace TelegramService.Handlers;
 internal class MessageHandler : IUpdateHandler<Message> {
     private readonly ILogger<MessageHandler> _logger;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IEnumerable<IValidator> _telegramValidators;
 
-    public MessageHandler(ILogger<MessageHandler> logger, IEnumerable<IValidator> telegramValidators, IServiceProvider serviceProvider) {
+    public MessageHandler(ILogger<MessageHandler> logger, IServiceProvider serviceProvider) {
         _logger = logger;
         _serviceProvider = serviceProvider;
-        _telegramValidators = telegramValidators;
-    }
-
-    private async Task<bool> IsValidAndError<T>(User user, T obj, ITelegramBotClient botClient, ChatId id)
-        where T : BotCommandAction {
-        var listOfRes = new List<ValidatorResult>();
-        foreach (var validator in _telegramValidators) {
-            var curRes = await validator.IsValidAsync(user, obj);
-            listOfRes.Add(curRes);
-        }
-
-        if (listOfRes.Any(e => e == ValidatorResult.Allow)) {
-            return true;
-        }
-
-        if (listOfRes.Any(e => e == ValidatorResult.Deny)) {
-            await botClient.SendTextMessageAsync(id, "У Вас не достаточно прав для выполнения данной операции");
-            return false;
-        }
-
-        return true;
     }
 
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, Message message, CancellationToken cancellationToken) {
@@ -61,10 +38,6 @@ internal class MessageHandler : IUpdateHandler<Message> {
                 var command = commands.FirstOrDefault(e => e.Command.Equals(msgtxt));
 
                 if (command != null) {
-                    if (await IsValidAndError(message.From!, command, botClient, message.Chat.Id) == false) {
-                        break;
-                    }
-
                     message.Text = String.Join(" ", message.Text!.Split(' ').Skip(1));
                     await command.ExecuteActionAsync(botClient, message, cancellationToken);
                 }

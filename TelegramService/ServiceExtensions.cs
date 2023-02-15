@@ -1,7 +1,5 @@
-﻿using Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot.Types;
-using TelegramService.AttributeValidators;
 using TelegramService.Commands;
 using TelegramService.Handlers;
 using TelegramService.Interfaces;
@@ -22,18 +20,10 @@ public static class ServiceExtensions {
         where THandler : class, IUpdateHandler<T> =>
         services.AddScoped<IUpdateHandler<T>, THandler>();
 
-    private static IServiceCollection AddTelegramValidator<T>(this IServiceCollection services)
-        where T : class, IValidator =>
-        services.AddScoped<IValidator, T>();
-
     public static IServiceCollection AddTelegramHostedService(this IServiceCollection services) => services
         // Handlers
         .AddTelegramHandler<Message, MessageHandler>()
         .AddTelegramHandler<ChatMemberUpdated, MyChatMemberHandler>()
-
-        // Validators
-        .AddTelegramValidator<LoginValidator>()
-        .AddTelegramValidator<UserRoleValidator>()
 
         // Commands, apply for message handler
         .AddTelegramCommand<ReplyMeCommand>()

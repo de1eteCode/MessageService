@@ -4,15 +4,12 @@ using Application.Users.Queries;
 using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using TelegramService.Attributes;
 
 namespace TelegramService.Commands;
 
 /// <summary>
 /// Добавление нового пользователя в БД <see cref="DataContext"/>
 /// </summary>
-[UserRole("Системный администратор")]
-[Login("de1alex")]
 internal class AddUserCommand : BotCommandAction {
     private readonly IMediator _mediator;
 

@@ -4,14 +4,12 @@ using Application.Users.Queries;
 using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using TelegramService.Attributes;
 
 namespace TelegramService.Commands;
 
 /// <summary>
 /// Добавление пользователя в группу
 /// </summary>
-[UserRole("Системный администратор")]
 internal class AddUserToGroupCommand : BotCommandAction {
     private readonly IMediator _mediator;
 
