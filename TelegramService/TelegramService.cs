@@ -1,6 +1,5 @@
-﻿using Infrastructure;
-using Infrastructure.Enums;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
@@ -9,13 +8,12 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TelegramService.Commands;
-using TelegramService.Handlers;
 using TelegramService.Interfaces;
 using TelegramService.Models;
 
 namespace TelegramService;
 
-public class TelegramHostedService : IHandlerHostedService, IWhoIam {
+public class TelegramHostedService : IHostedService, IWhoIam {
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<TelegramHostedService> _logger;
     private readonly TelegramBotClient _telegramClient;
@@ -50,8 +48,6 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
 
     #region Service method
 
-    public ServiceState State { get; private set; }
-
     /// <summary>
     /// Запуск сервиса
     /// Метод, предоставляемый <see cref="IHostedService"/>
@@ -72,7 +68,7 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
         }
 
         _logger.LogInformation($"Запущен {nameof(TelegramService)}");
-        State = ServiceState.Online;
+
         return Task.CompletedTask;
     }
 
@@ -83,7 +79,7 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
     public Task StopAsync(CancellationToken cancellationToken) {
         _tokenSource.Cancel();
         _logger.LogInformation($"Остановлен {nameof(TelegramService)}");
-        State = ServiceState.Offline;
+
         return Task.CompletedTask;
     }
 
@@ -128,8 +124,6 @@ public class TelegramHostedService : IHandlerHostedService, IWhoIam {
         };
 
         _logger.LogError(msg);
-
-        State = ServiceState.FatalError;
 
         return Task.CompletedTask;
     }

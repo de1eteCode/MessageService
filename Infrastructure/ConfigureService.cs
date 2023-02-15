@@ -9,7 +9,8 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class ConfigureServices {
 
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration) {
-        services.AddTransient<IDateTime, DateTimeService>();
+        services.AddTransient<ICurrentUserService, CurrentUserService>();
+        services.AddTransient<IIdentityService, IdentityService>();
 
         // Infrastructure: EF Core
         services.AddDbContext<IDataContext, DataContext>(options => {

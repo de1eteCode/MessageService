@@ -1,13 +1,15 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Application.Common.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Telegram.Bot.Types;
 using TelegramService.Commands;
 using TelegramService.Handlers;
 using TelegramService.Interfaces;
 using TelegramService.PassiveCommands;
+using TelegramService.Services;
 
 namespace TelegramService;
 
-public static class ServiceExtensions {
+public static class ConfigureServices {
 
     /// <summary>
     /// Добавление команды боту
@@ -21,6 +23,10 @@ public static class ServiceExtensions {
         services.AddScoped<IUpdateHandler<T>, THandler>();
 
     public static IServiceCollection AddTelegramHostedService(this IServiceCollection services) => services
+        // Identity
+        .AddTransient<ICurrentUserService, TelegramCurrentUserService>()
+        .AddTransient<IIdentityService, TelegramIdentityService>()
+
         // Handlers
         .AddTelegramHandler<Message, MessageHandler>()
         .AddTelegramHandler<ChatMemberUpdated, MyChatMemberHandler>()
