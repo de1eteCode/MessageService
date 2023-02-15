@@ -1,8 +1,7 @@
-﻿using Application.ChatGroups.Commands.CreateChatGroup;
-using Application.ChatGroups.Commands.UpdateChatGroup;
-using Application.Chats.Queries.GetChat;
-using Application.Groups.Queries.GetGroup;
-using Application.Users.Queries.GetUser;
+﻿using Application.ChatGroups.Commands;
+using Application.Chats.Queries;
+using Application.Groups.Queries;
+using Application.Users.Queries;
 using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types;

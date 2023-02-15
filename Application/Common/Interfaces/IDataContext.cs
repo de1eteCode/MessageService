@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 namespace Application.Common.Interfaces;
 
 public interface IDataContext : IDisposable {
-    public DbSet<Chat> Chats { get; set; }
-    public DbSet<ChatGroup> ChatGroups { get; set; }
-    public DbSet<Group> Groups { get; set; }
-    public DbSet<Role> Roles { get; set; }
-    public DbSet<User> Users { get; set; }
-    public DbSet<UserGroup> UserGroups { get; set; }
+    public DbSet<Chat> Chats { get; }
+    public DbSet<ChatGroup> ChatGroups { get; }
+    public DbSet<Group> Groups { get; }
+    public DbSet<Role> Roles { get; }
+    public DbSet<User> Users { get; }
+    public DbSet<UserGroup> UserGroups { get; }
 
     public EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
 

@@ -1,10 +1,6 @@
-﻿using Application.Chats.Commands.CreateChat;
-using Application.Chats.Commands.UpdateChat;
-using Application.Chats.Queries.GetChat;
-using Application.Common.Interfaces;
-using Domain.Models;
+﻿using Application.Chats.Commands;
+using Application.Chats.Queries;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot.Types;
 

@@ -1,6 +1,6 @@
-﻿using Application.Roles.Queries.GetRoles;
-using Application.Users.Commands.UpdateUser;
-using Application.Users.Queries.GetUser;
+﻿using Application.Roles.Queries;
+using Application.Users.Commands;
+using Application.Users.Queries;
 using MediatR;
 using Telegram.Bot;
 using Telegram.Bot.Types;
