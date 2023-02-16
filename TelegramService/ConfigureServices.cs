@@ -23,9 +23,10 @@ public static class ConfigureServices {
         services.AddScoped<IUpdateHandler<T>, THandler>();
 
     public static IServiceCollection AddTelegramHostedService(this IServiceCollection services) => services
+        .AddScoped<ICurrentTelegramUpdate, CurrentTelegramUpdateService>()
         // Identity
-        .AddTransient<ICurrentUserService, TelegramCurrentUserService>()
-        .AddTransient<IIdentityService, TelegramIdentityService>()
+        .AddScoped<ICurrentUserService, TelegramCurrentUserService>()
+        .AddScoped<IIdentityService, TelegramIdentityService>()
 
         // Handlers
         .AddTelegramHandler<Message, MessageHandler>()

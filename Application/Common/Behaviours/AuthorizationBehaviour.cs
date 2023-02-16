@@ -22,10 +22,18 @@ internal class AuthorizationBehaviour<TRequest, TResponce> : IPipelineBehavior<T
             return await next();
         }
 
-        if (_currentUserService.UserId == null) {
+        if (_currentUserService.UserId == null || _currentUserService.UserId == Guid.Empty) {
             throw new UnauthorizedAccessException();
         }
 
-        throw new NotImplementedException();
+        foreach (var role in authorizeAttributes.SelectMany(e => e.Roles.Split(' ')).Distinct()) {
+            var result = await _identityService.IsInRoleAsync((Guid)_currentUserService.UserId, role);
+
+            if (result == true) {
+                return await next();
+            }
+        }
+
+        throw new UnauthorizedAccessException();
     }
 }

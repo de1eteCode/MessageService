@@ -10,6 +10,7 @@ using Telegram.Bot.Types.Enums;
 using TelegramService.Commands;
 using TelegramService.Interfaces;
 using TelegramService.Models;
+using TelegramService.Services;
 
 namespace TelegramService;
 
@@ -93,6 +94,9 @@ public class TelegramHostedService : IHostedService, IWhoIam {
     /// <param name="cancellationToken">Токен отмены операции</param>
     private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken) {
         using (var scope = _scopeFactory.CreateScope()) {
+            var tgUpdateService = scope.ServiceProvider.GetService<ICurrentTelegramUpdate>() as CurrentTelegramUpdateService ?? throw new Exception();
+            tgUpdateService.SetUpdate(update);
+
             if (_supportedUpdates.TryGetValue(update.Type, out var handler)) {
                 cancellationToken.ThrowIfCancellationRequested();
                 await handler(botClient, update, cancellationToken, scope.ServiceProvider).ConfigureAwait(false);
